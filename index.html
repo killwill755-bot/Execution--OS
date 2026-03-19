@@ -146,11 +146,11 @@ const PHASE_META = [
 ];
 
 const QUESTIONS = [
-  {q:"What is your primary skill or expertise?",p:"e.g. Coding, copywriting, video editing..."},
-  {q:"Who do you most want to serve?",p:"e.g. E-commerce brands, SaaS founders..."},
-  {q:"What specific result do you deliver?",p:"e.g. Save 10hrs/week, increase revenue 30%..."},
-  {q:"What is your preferred business format?",p:"e.g. Done-for-you service, SaaS, newsletter..."},
-  {q:"What is your revenue goal in 30 days?",p:"e.g. $1,000, $5,000, $10,000..."},
+  {q:"What is your primary skill or expertise?",icon:"🧠",opts:["Coding / Tech","Copywriting / Writing","Video / Design","Sales / Marketing","Finance / Consulting","Operations / Systems"]},
+  {q:"Who do you most want to serve?",icon:"🎯",opts:["E-commerce Brands","SaaS / Tech Startups","Coaches & Creators","Real Estate Investors","Small Businesses","Freelancers / Solopreneurs"]},
+  {q:"What is your preferred business format?",icon:"⚙️",opts:["Done-For-You Service","SaaS / Software Tool","Newsletter / Content","Online Course","Templates / Products","Consulting / Strategy"]},
+  {q:"How much time can you invest per week?",icon:"⏱️",opts:["Under 5 hours","5–10 hours","10–20 hours","20–40 hours","Full-time (40hrs+)","Flexible / Varies"]},
+  {q:"What is your revenue goal in 30 days?",icon:"💰",opts:["$500 – $1,000","$1,000 – $3,000","$3,000 – $5,000","$5,000 – $10,000","$10,000+","Just getting started"]},
 ];
 
 const RESOURCES = [
@@ -789,18 +789,46 @@ function renderModalBody() {
     `;
   }
 
-  // Question view
+  // Question view — option buttons
   const q = QUESTIONS[step] || QUESTIONS[0];
   const bars = QUESTIONS.map((_,i) => `<div style="flex:1;height:3px;border-radius:2px;background:${i<=step?"#007AFF":"rgba(255,255,255,.07)"}"></div>`).join("");
+  const selected = S.qaAnswers[step] || "";
+  const optButtons = (q.opts||[]).map(opt => {
+    const isSel = selected === opt;
+    const sv = opt.replace(/'/g, "\\'");
+    return `<button class="qa-opt-btn" data-val="${opt}" onclick="selectQAOption('${sv}')"
+      style="padding:13px 16px;border-radius:10px;width:100%;
+      border:2px solid ${isSel?"#007AFF":"rgba(255,255,255,.1)"};
+      background:${isSel?"rgba(0,122,255,.12)":"rgba(255,255,255,.03)"};
+      color:${isSel?"#007AFF":"#C8C8D0"};font-size:13px;font-weight:${isSel?"700":"500"};
+      cursor:pointer;text-align:left;transition:all .15s;font-family:inherit;
+      display:flex;align-items:center;gap:10px">
+      <span class="opt-dot" style="width:16px;height:16px;border-radius:50%;flex-shrink:0;
+        border:2px solid ${isSel?"#007AFF":"rgba(255,255,255,.25)"};
+        background:${isSel?"#007AFF":"transparent"};
+        display:flex;align-items:center;justify-content:center">
+        <span style="width:6px;height:6px;border-radius:50%;background:#fff;display:${isSel?"block":"none"}"></span>
+      </span>
+      ${opt}
+    </button>`;
+  }).join("");
   return `
     <div style="animation:fadeUp .3s ease">
-      <div style="display:flex;gap:6px;margin-bottom:30px">${bars}</div>
-      <div style="font-size:12px;color:#007AFF;font-weight:700;margin-bottom:10px">QUESTION ${step+1} OF ${QUESTIONS.length}</div>
-      <div style="font-size:20px;font-weight:700;margin-bottom:24px">${q.q}</div>
-      <input id="qa-input" class="field" placeholder="${q.p}" value="${S.qaAnswers[step]||""}">
-      <div style="display:flex;justify-content:space-between;margin-top:22px">
-        <button class="btn btn-ghost" id="qa-back" onclick="if(S.qaStep>0){setState({qaStep:S.qaStep-1})}" ${step===0?"disabled":""}>← Back</button>
-        <button class="btn btn-primary" id="qa-next" onclick="handleQANext()">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
+      <div style="display:flex;gap:6px;margin-bottom:26px">${bars}</div>
+      <div style="font-size:12px;color:#007AFF;font-weight:700;margin-bottom:8px">QUESTION ${step+1} OF ${QUESTIONS.length}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <span style="font-size:26px">${q.icon||"💡"}</span>
+        <div style="font-size:19px;font-weight:700">${q.q}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
+        ${optButtons}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="btn btn-ghost" onclick="if(S.qaStep>0){S.qaStep--;var b=document.getElementById('modal-body');if(b){b.innerHTML=renderModalBody();bindModalAfterRender();}}" ${step===0?"disabled":""}>← Back</button>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${!selected?'<span style="font-size:12px;color:#4A4A5A">👆 Pick one</span>':""}
+          <button id="qa-next-btn" class="btn btn-primary" onclick="handleQANext()" ${!selected?"disabled":""} style="opacity:${selected?"1":"0.45"}">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
+        </div>
       </div>
     </div>
   `;
@@ -926,182 +954,78 @@ function bindModalEvents() {
 }
 
 async function handleQANext() {
-  // Always read directly from DOM — most reliable approach
-  const input = document.getElementById("qa-input");
-  const val = (input ? input.value : "").trim();
+  const val = S.qaAnswers[S.qaStep] || "";
   if (!val) return;
-  S.qaAnswers = { ...S.qaAnswers, [S.qaStep]: val };
-
   if (S.qaStep < QUESTIONS.length - 1) {
-    setState({qaStep: S.qaStep+1});
+    S.qaStep++;
+    // Re-render modal body for next question
+    const body = document.getElementById("modal-body");
+    if (body) { body.innerHTML = renderModalBody(); bindModalAfterRender(); }
     return;
   }
-
   // Last question — generate ideas
-  setState({qaLoading:true});
-
+  S.qaLoading = true;
+  const body = document.getElementById("modal-body");
+  if (body) { body.innerHTML = renderModalBody(); }
   try {
-    const data = await gasPost({action:"filterTop20",userProfile:{skillset:S.qaAnswers[0],audience:S.qaAnswers[1],result:S.qaAnswers[2],format:S.qaAnswers[3],revenue:S.qaAnswers[4]}});
-    if (data?.top20?.length > 0) {
-      setState({qaIdeas:data.top20, qaLoading:false, qaStep:QUESTIONS.length});
-    } else throw new Error("no results");
+    const data = await gasPost({action:"filterTop20",userProfile:{skillset:S.qaAnswers[0],audience:S.qaAnswers[1],format:S.qaAnswers[2],time:S.qaAnswers[3],revenue:S.qaAnswers[4]}});
+    if (data?.top20?.length > 0) { S.qaIdeas = data.top20; }
+    else throw new Error("no results");
   } catch {
-    // Fallback: local ranking
-    const ranked = IDEAS.map(i=>({...i,conf:75+Math.floor(Math.random()*24)}))
-      .sort((a,b)=>b.conf-a.conf);
-    setState({qaIdeas:ranked, qaLoading:false, qaStep:QUESTIONS.length});
+    S.qaIdeas = IDEAS.map(i=>({...i,conf:75+Math.floor(Math.random()*24)})).sort((a,b)=>b.conf-a.conf);
   }
+  S.qaLoading = false;
+  S.qaStep = QUESTIONS.length;
+  if (body) { body.innerHTML = renderModalBody(); bindModalAfterRender(); }
 }
 
-function bindDashEvents() {
-  // Find idea button
-  document.querySelector(".btn-primary[data-find]")?.addEventListener("click", ()=>setState({modalOpen:true}));
-
-  // Topbar find idea
-  document.querySelectorAll(".btn-primary").forEach(b=>{
-    if(b.textContent.includes("Find Idea")) b.addEventListener("click",()=>setState({modalOpen:true}));
-  });
-
-  // Task checkboxes (roadmap)
-  document.querySelectorAll(".task-check").forEach(cb=>{
-    cb.addEventListener("change", e=>{
-      const key = e.target.dataset.key;
-      S.taskDone[key] = e.target.checked;
-      gasPost({action:"updateProgress",taskKey:key,status:e.target.checked?"complete":"pending"});
-      render();
+function bindModalAfterRender() {
+  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      const idea = S.qaIdeas[idx];
+      if (idea) {
+        S.idea = idea; S.modalOpen = false;
+        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
+        S.page = "dashboard"; S.tab = "launch";
+        gasPost({action:"populateRoadmap",ideaId:idea.id});
+        render();
+      }
     });
   });
-
-  // Task circle toggle (launchpad)
-  document.querySelectorAll(".check-circle").forEach(c=>{
-    c.addEventListener("click", ()=>{
-      const key = c.dataset.key;
-      S.taskDone[key] = !S.taskDone[key];
-      gasPost({action:"updateProgress",taskKey:key,status:S.taskDone[key]?"complete":"pending"});
-      render();
-    });
-  });
-
-  // Toolkit buttons
-  document.querySelectorAll(".toolkit-btn").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      const idx = parseInt(b.dataset.idx);
-      const task = {...TASKS.p1[idx], idx};
-      setState({drawerTask:task});
-    });
-  });
-
-  // Nuclear button
-  document.getElementById("nuclear-btn")?.addEventListener("click", ()=>{
-    spawnConfetti();
-    setState({launched:true});
-  });
-
-  // Go to roadmap
-  document.getElementById("go-roadmap")?.addEventListener("click",()=>setState({tab:"roadmap"}));
-
-  // Drawer generate
-  document.getElementById("gen-drawer-btn")?.addEventListener("click", async()=>{
-    const task = S.drawerTask;
-    const idea = S.idea;
-    const body = document.getElementById("drawer-body");
-    if(!body)return;
-    body.innerHTML = `<div style="text-align:center;padding:50px"><div class="spinner" style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating your plan...</div></div>`;
-
-    const prompts = [
-      `Business: "${idea?.name}". USP: ${idea?.usp}. Write a 6-step market validation plan with search terms, 3 subreddits to check, and 3 qualifying questions for prospects.`,
-      `Business: "${idea?.name}". Identify 5 competitors I should research, what differentiates me, and how to position to win.`,
-      `Business: "${idea?.name}". USP: ${idea?.usp}. Write 3 irresistible offer variants: core promise, price, what is included, one-line pitch.`,
-      `Business: "${idea?.name}". Write complete landing page copy: hero headline, subheadline, 3 benefit bullets, 3 FAQs, CTA text. Ready to paste.`,
-      `Business: "${idea?.name}". Give exact step-by-step Gumroad setup: product creation, pricing, checkout, handling first refund.`,
-      `Business: "${idea?.name}". Write 3 lead magnet ideas with title, format, 50-word description. Then full outline for the best one.`,
-      `Business: "${idea?.name}". Write launch day war room plan: what to post first, metrics to check every 30 min, what to do with zero sales in 3 hours.`,
-    ];
-
-    const result = await askClaude(prompts[task.idx]||prompts[0]);
-    body.innerHTML = `
-      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px;font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${result}</div>
-      <div style="display:flex;gap:10px;margin-top:14px">
-        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(this.closest('[style]').querySelector('div').textContent)">📋 Copy All</button>
-        <button class="btn btn-ghost btn-sm" id="gen-drawer-btn">🔄 Regenerate</button>
-      </div>
-    `;
-    // Re-bind regen
-    body.querySelector("#gen-drawer-btn")?.addEventListener("click", ()=>{
-      document.getElementById("gen-drawer-btn")?.click();
-    });
-  });
-
-  // Close drawer
-  document.getElementById("close-drawer")?.addEventListener("click",()=>setState({drawerTask:null}));
-
-  // Script type buttons
-  document.querySelectorAll(".script-type-btn").forEach(b=>{
-    b.addEventListener("click", async()=>{
-      const type = b.dataset.type;
-      setState({scriptActive:type});
-
-      if (S.scriptOuts[type]) return;
-      if (!S.idea) return;
-
-      S.scriptLoading[type] = true;
-      render();
-
-      const COPY_PROMPTS = {
-        reddit: `Write a Reddit launch post for: "${S.idea.name}". USP: ${S.idea.usp}. Story-first, reveal product at end. Reddit markdown title and 300-word body.`,
-        twitter: `Write an 8-tweet viral thread for: "${S.idea.name}". USP: ${S.idea.usp}. Tweet 1 is scroll-stopping. Number each "1/" style.`,
-        cold_dm: `Write 3 cold DM versions for: "${S.idea.name}". Short (50 words), Medium (100 words), Story-based (200 words). Human tone.`,
-        linkedin: `Write a LinkedIn launch post for: "${S.idea.name}". Hook, problem, solution, social proof, CTA in comments.`,
-        email: `Write a launch email for: "${S.idea.name}". Subject (2 variants), preview text, full body with hook/story/offer/CTA, PS line.`,
-      };
-
-      const copy = await askClaude(COPY_PROMPTS[type]||COPY_PROMPTS.reddit, "You are an elite direct-response copywriter.");
-      S.scriptOuts[type] = copy;
-      S.scriptLoading[type] = false;
-      render();
-    });
-  });
-
-  // Copy buttons (scripts tab)
-  document.querySelector(".copy-static-scripts")?.addEventListener("click",()=>S.idea&&navigator.clipboard.writeText(S.idea.scripts));
-  document.querySelector(".copy-static-scale")?.addEventListener("click",()=>S.idea&&navigator.clipboard.writeText(S.idea.scale));
-  document.querySelectorAll(".copy-ai-output").forEach(b=>{
-    b.addEventListener("click",()=>navigator.clipboard.writeText(decodeURIComponent(b.dataset.text)));
-  });
-  document.querySelectorAll(".regen-script").forEach(b=>{
-    b.addEventListener("click",()=>{
-      const type=b.dataset.type;
-      S.scriptOuts[type]=null;
-      setState({scriptActive:type});
-      setTimeout(()=>document.querySelector(`.script-type-btn[data-type="${type}"]`)?.click(),100);
-    });
-  });
-
-  // Notes
-  document.getElementById("notes-area")?.addEventListener("input",e=>{
-    S.notes=e.target.value;
-    S.notesSaved=false;
-    clearTimeout(notesTimer);
-    notesTimer=setTimeout(async()=>{
-      await gasPost({action:"saveNotes",notes:S.notes});
-      S.notesSaved=true;
-      const ind=document.querySelector("#notes-area")?.closest(".content")?.querySelector("p span");
-      if(ind){ind.style.color="#34D399";ind.textContent="✓ Auto-saved";}
-    },60000);
-  });
-  document.getElementById("copy-notes")?.addEventListener("click",()=>navigator.clipboard.writeText(S.notes));
-
-  // Modal
-  if(S.modalOpen){
-    bindModalEvents();
-  }
 }
 
-// ── INIT ──────────────────────────────────────────
-// Expose key functions globally for inline onclick handlers
+// ── selectQAOption — called by option buttons ─────
+function selectQAOption(val) {
+  S.qaAnswers[S.qaStep] = val;
+  // Update option buttons visually without full re-render
+  document.querySelectorAll(".qa-opt-btn").forEach(btn => {
+    const isSel = btn.dataset.val === val;
+    btn.style.borderColor = isSel ? "#007AFF" : "rgba(255,255,255,.1)";
+    btn.style.background   = isSel ? "rgba(0,122,255,.12)" : "rgba(255,255,255,.03)";
+    btn.style.color        = isSel ? "#007AFF" : "#C8C8D0";
+    btn.style.fontWeight   = isSel ? "700" : "500";
+    const dot   = btn.querySelector(".opt-dot");
+    const inner = btn.querySelector("span span");
+    if (dot)   { dot.style.borderColor = isSel ? "#007AFF" : "rgba(255,255,255,.25)"; dot.style.background = isSel ? "#007AFF" : "transparent"; }
+    if (inner) { inner.style.display = isSel ? "block" : "none"; }
+  });
+  // Enable Next button
+  const nb = document.getElementById("qa-next-btn");
+  if (nb) { nb.disabled = false; nb.style.opacity = "1"; }
+  // Hide hint
+  const hint = document.querySelector("#modal-body span[style*='Pick one']");
+  if (hint) hint.style.display = "none";
+}
+
+// Expose globally
 window.handleQANext = handleQANext;
+window.selectQAOption = selectQAOption;
 window.setState = setState;
 window.S = S;
+window.renderModalBody = renderModalBody;
+window.bindModalAfterRender = bindModalAfterRender;
 
 render();
 </script>
