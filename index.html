@@ -799,8 +799,8 @@ function renderModalBody() {
       <div style="font-size:20px;font-weight:700;margin-bottom:24px">${q.q}</div>
       <input id="qa-input" class="field" placeholder="${q.p}" value="${S.qaAnswers[step]||""}">
       <div style="display:flex;justify-content:space-between;margin-top:22px">
-        <button class="btn btn-ghost" id="qa-back" ${step===0?"disabled":""}>← Back</button>
-        <button class="btn btn-primary" id="qa-next">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
+        <button class="btn btn-ghost" id="qa-back" onclick="if(S.qaStep>0){setState({qaStep:S.qaStep-1})}" ${step===0?"disabled":""}>← Back</button>
+        <button class="btn btn-primary" id="qa-next" onclick="handleQANext()">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
       </div>
     </div>
   `;
@@ -926,10 +926,11 @@ function bindModalEvents() {
 }
 
 async function handleQANext() {
+  // Always read directly from DOM — most reliable approach
   const input = document.getElementById("qa-input");
-  const val = input ? input.value.trim() : (S.qaAnswers[S.qaStep]||"");
+  const val = (input ? input.value : "").trim();
   if (!val) return;
-  S.qaAnswers[S.qaStep] = val;
+  S.qaAnswers = { ...S.qaAnswers, [S.qaStep]: val };
 
   if (S.qaStep < QUESTIONS.length - 1) {
     setState({qaStep: S.qaStep+1});
@@ -1097,6 +1098,11 @@ function bindDashEvents() {
 }
 
 // ── INIT ──────────────────────────────────────────
+// Expose key functions globally for inline onclick handlers
+window.handleQANext = handleQANext;
+window.setState = setState;
+window.S = S;
+
 render();
 </script>
 </body>
