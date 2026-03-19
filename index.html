@@ -779,7 +779,7 @@ function renderModalBody() {
             <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#4A4A5A">Difficulty</span><div style="display:flex;gap:2px">${[1,2,3,4,5].map(d=>`<div style="width:7px;height:7px;border-radius:2px;background:${d<=diff?diffC:"rgba(255,255,255,.1)"}"></div>`).join("")}</div></div>
             <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Launch Speed</span><span style="font-size:10px;color:#F59E0B;font-weight:700">7 hours</span></div>
           </div>
-          <button class="btn btn-primary btn-sm idea-pick-btn" data-idx="${i}" style="width:100%">🚀 Start Execution</button>
+          <button class="btn btn-primary btn-sm" onclick="pickIdea(${i})" style="width:100%">🚀 Start Execution</button>
         </div>
       `;
     }).join("");
@@ -906,6 +906,127 @@ function render() {
 }
 
 // ── EVENT BINDING ─────────────────────────────────
+function bindDashEvents() {
+  // Nav tabs
+  document.querySelectorAll(".nav-btn").forEach(b => {
+    b.addEventListener("click", () => setState({tab: b.textContent.trim().includes("Launch")?"launch":b.textContent.trim().includes("Script")?"scripts":b.textContent.trim().includes("Roadmap")?"roadmap":b.textContent.trim().includes("Notes")?"notes":"resources"}));
+  });
+
+  // Find idea button in topbar
+  document.querySelectorAll("button").forEach(b => {
+    if (b.textContent.includes("Find Idea")) b.addEventListener("click", () => setState({modalOpen:true}));
+  });
+
+  // Task circle toggle (launchpad)
+  document.querySelectorAll(".check-circle").forEach(c => {
+    c.addEventListener("click", () => {
+      const key = c.dataset.key;
+      S.taskDone[key] = !S.taskDone[key];
+      gasPost({action:"updateProgress", taskKey:key, status:S.taskDone[key]?"complete":"pending"});
+      render();
+    });
+  });
+
+  // Toolkit buttons
+  document.querySelectorAll(".toolkit-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      const idx = parseInt(b.dataset.idx);
+      const task = {...TASKS.p1[idx], idx};
+      setState({drawerTask:task});
+    });
+  });
+
+  // Nuclear launch button
+  document.getElementById("nuclear-btn")?.addEventListener("click", () => {
+    spawnConfetti();
+    setState({launched:true});
+  });
+
+  // Go to roadmap after launch
+  document.getElementById("go-roadmap")?.addEventListener("click", () => setState({tab:"roadmap"}));
+
+  // Drawer generate button
+  document.getElementById("gen-drawer-btn")?.addEventListener("click", async () => {
+    const task = S.drawerTask;
+    const idea = S.idea;
+    const body = document.getElementById("drawer-body");
+    if (!body) return;
+    body.innerHTML = `<div style="text-align:center;padding:50px"><div class="spinner" style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating your plan...</div></div>`;
+    const prompts = [
+      `Business: "${idea?.name}". Write a 6-step market validation plan with search terms, subreddits, and qualifying questions.`,
+      `Business: "${idea?.name}". Identify 5 competitors and how to position against them.`,
+      `Business: "${idea?.name}". USP: ${idea?.usp}. Write 3 irresistible offer variants with price and pitch.`,
+      `Business: "${idea?.name}". Write complete landing page copy: headline, bullets, FAQs, CTA.`,
+      `Business: "${idea?.name}". Exact step-by-step Gumroad setup guide.`,
+      `Business: "${idea?.name}". Write 3 lead magnet ideas and full outline for the best one.`,
+      `Business: "${idea?.name}". Write launch day war room plan with 30-min check-in metrics.`,
+    ];
+    const result = await askClaude(prompts[task?.idx||0]);
+    body.innerHTML = `
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px;font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${result}</div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.querySelector('#drawer-body pre, #drawer-body div').textContent)">📋 Copy All</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('gen-drawer-btn').click()">🔄 Regenerate</button>
+      </div>`;
+  });
+
+  // Close drawer
+  document.getElementById("close-drawer")?.addEventListener("click", () => setState({drawerTask:null}));
+
+  // Script type buttons
+  document.querySelectorAll(".script-type-btn").forEach(b => {
+    b.addEventListener("click", async () => {
+      const type = b.dataset.type;
+      S.scriptActive = type;
+      if (S.scriptOuts[type]) { render(); return; }
+      if (!S.idea) return;
+      S.scriptLoading[type] = true;
+      render();
+      const COPY_PROMPTS = {
+        reddit:   `Write a Reddit launch post for: "${S.idea.name}". Story-first, reveal product at end. 300-word body.`,
+        twitter:  `Write an 8-tweet viral thread for: "${S.idea.name}". Tweet 1 is scroll-stopping. Number each "1/".`,
+        cold_dm:  `Write 3 cold DM versions for: "${S.idea.name}". Short (50w), Medium (100w), Story (200w). Human tone.`,
+        linkedin: `Write a LinkedIn launch post for: "${S.idea.name}". Hook, problem, solution, CTA in comments.`,
+        email:    `Write a launch email for: "${S.idea.name}". Subject (2 variants), preview, full body, PS line.`,
+      };
+      const copy = await askClaude(COPY_PROMPTS[type]||COPY_PROMPTS.reddit, "You are an elite copywriter. Be specific and conversion-focused.");
+      S.scriptOuts[type] = copy;
+      S.scriptLoading[type] = false;
+      render();
+    });
+  });
+
+  // Copy static scripts
+  document.querySelector(".copy-static-scripts")?.addEventListener("click", () => S.idea && navigator.clipboard.writeText(S.idea.scripts));
+  document.querySelector(".copy-static-scale")?.addEventListener("click",   () => S.idea && navigator.clipboard.writeText(S.idea.scale));
+
+  // Roadmap task checkboxes
+  document.querySelectorAll(".task-check").forEach(cb => {
+    cb.addEventListener("change", e => {
+      const key = e.target.dataset.key;
+      S.taskDone[key] = e.target.checked;
+      gasPost({action:"updateProgress", taskKey:key, status:e.target.checked?"complete":"pending"});
+      render();
+    });
+  });
+
+  // Notes
+  document.getElementById("notes-area")?.addEventListener("input", e => {
+    S.notes = e.target.value;
+    S.notesSaved = false;
+    clearTimeout(notesTimer);
+    notesTimer = setTimeout(async () => {
+      await gasPost({action:"saveNotes", notes:S.notes});
+      S.notesSaved = true;
+      render();
+    }, 60000);
+  });
+  document.getElementById("copy-notes")?.addEventListener("click", () => navigator.clipboard.writeText(S.notes));
+
+  // Modal open (if needed)
+  if (S.modalOpen) bindModalEvents();
+}
+
 function bindHomeEvents() {
   document.getElementById("home-find-idea")?.addEventListener("click", () => {
     setState({modalOpen:true});
@@ -1019,13 +1140,33 @@ function selectQAOption(val) {
   if (hint) hint.style.display = "none";
 }
 
+// ── pickIdea — called by Start Execution button ───
+function pickIdea(idx) {
+  const idea = S.qaIdeas[idx];
+  if (!idea) return;
+  S.idea = idea;
+  S.modalOpen = false;
+  S.qaStep = 0;
+  S.qaAnswers = {};
+  S.qaIdeas = [];
+  S.page = "dashboard";
+  S.tab = "launch";
+  gasPost({action:"populateRoadmap", ideaId:idea.id});
+  render();
+}
+
 // Expose globally
 window.handleQANext = handleQANext;
+window.pickIdea = pickIdea;
 window.selectQAOption = selectQAOption;
 window.setState = setState;
 window.S = S;
 window.renderModalBody = renderModalBody;
 window.bindModalAfterRender = bindModalAfterRender;
+window.bindDashEvents = bindDashEvents;
+window.bindHomeEvents = bindHomeEvents;
+window.bindModalEvents = bindModalEvents;
+window.render = render;
 
 render();
 </script>
