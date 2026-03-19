@@ -562,36 +562,221 @@ async function genScript(ch,outEl){
   S.scriptActive=ch.id;
   if(S.scriptOuts[ch.id]){render();return;}
   S.scriptLoading[ch.id]=true;render();
+
+  const n=S.idea.name, u=S.idea.usp, sc=S.idea.scripts||"";
+
   const P={
-    reddit:`Reddit post for: "${S.idea.name}". USP: ${S.idea.usp}. Story-first, product at end. Title + 300-word body in Reddit markdown.`,
-    twitter:`8-tweet viral thread for: "${S.idea.name}". Tweet 1 is scroll-stopping. Number "1/" style.`,
-    cold_dm:`3 cold DMs for: "${S.idea.name}". Short (50w), Medium (100w), Story (200w). Human, not salesy.`,
-    linkedin:`LinkedIn launch post for: "${S.idea.name}". Hook → problem → solution → CTA in comments.`,
-    email:`Launch email for: "${S.idea.name}". Subject (2 options), preview, full body with hook/story/offer/CTA, PS line.`,
+    reddit:`You are an elite Reddit copywriter. Write a viral Reddit post for: "${n}" (${u})
+
+FORMAT:
+**TITLE:** [Write a curiosity-gap title that gets clicks — no clickbait, genuine value]
+
+**POST BODY:**
+[Write 300-400 words. Structure: 
+- Start with a relatable personal story or shocking stat (2 sentences)
+- Describe the painful problem in vivid detail (3-4 sentences)
+- Share what you discovered/built (3-4 sentences — don't oversell)
+- Give 3-4 GENUINE value tips they can use right now
+- Soft mention of your solution at the end
+- Ask a question to drive comments]
+
+**BEST SUBREDDITS TO POST:** [List 4 relevant subreddits]
+
+Make it feel like a real person sharing genuine value, NOT an ad.`,
+
+    twitter:`You are a viral Twitter copywriter. Write an 8-tweet thread for: "${n}" (${u})
+
+FORMAT — number each tweet exactly like this:
+
+1/
+[HOOK TWEET — Must make people stop scrolling. Use a shocking stat, counterintuitive claim, or bold promise. Under 280 chars]
+
+2/
+[Setup — describe the problem or backstory vividly]
+
+3/
+[Agitate — make the pain real with specific details or numbers]
+
+4/
+[Insight/revelation — the key thing most people miss]
+
+5/
+[Value — specific actionable tip #1]
+
+6/
+[Value — specific actionable tip #2 or case study result]
+
+7/
+[The solution reveal — introduce ${n} naturally, not salesy]
+
+8/
+[CTA tweet — follow for more + link in bio + question to drive replies]
+
+Each tweet: punchy, no fluff, under 280 characters. Use line breaks for readability.`,
+
+    cold_dm:`You are an elite cold outreach copywriter. Write 3 cold DM scripts for: "${n}" (${u})
+
+---
+## VERSION 1 — ULTRA SHORT (Under 50 words)
+[Write it — conversational, specific, one clear ask]
+
+---
+## VERSION 2 — MEDIUM (Under 100 words)
+[Write it — acknowledge their situation, hint at value, soft ask]
+
+---
+## VERSION 3 — STORY-BASED (Under 200 words)
+[Write it — open with a result/insight, connect to their pain, offer value first, then ask]
+
+---
+## PRO TIPS FOR SENDING:
+- Best time to send: [day/time]
+- Personalization tip: [what to research first]
+- Follow-up if no reply after 3 days: [write the follow-up line]`,
+
+    linkedin:`You are a LinkedIn algorithm expert and copywriter. Write a viral LinkedIn post for: "${n}" (${u})
+
+STRUCTURE (follow this exactly for algorithm performance):
+
+[LINE 1 — HOOK: Bold single sentence that creates curiosity or makes a strong claim]
+
+[LINE 2 — blank line]
+
+[LINE 3-4 — Setup: 1-2 sentences expanding on the hook]
+
+[Line break]
+
+[Body — 4-6 short paragraphs, each 1-3 lines max. Use line breaks liberally.
+Include: the problem, what you discovered, 3 specific insights with numbers/data, the solution reveal]
+
+[Line break]
+
+[Conclusion — 2 sentences summing up the key takeaway]
+
+[Line break]
+
+[CTA — Ask a question to drive comments. Say "Link in comments" for your product link]
+
+---
+HASHTAGS: [5 relevant hashtags]
+BEST TIME TO POST: [day + time]
+COMMENT TO PIN: [Write the comment with your product link to pin at top]`,
+
+    email:`You are an elite email copywriter. Write a complete launch email for: "${n}" (${u})
+
+---
+## SUBJECT LINE OPTIONS (A/B test these):
+A: [Subject line A — curiosity-based]
+B: [Subject line B — benefit-based]
+
+## PREVIEW TEXT:
+[30-50 chars that appear after subject line in inbox]
+
+---
+## EMAIL BODY:
+
+Hi [First Name],
+
+[HOOK — 2 sentences. Start with a story, stat, or bold claim that relates to their pain]
+
+[PROBLEM — 2-3 sentences. Describe their struggle in words they use themselves]
+
+[AGITATE — 1-2 sentences. Make the cost of inaction real — time, money, stress]
+
+[BRIDGE — 1-2 sentences. "That's why I built..." transition]
+
+[SOLUTION — 3-4 sentences. Describe ${n} and its core benefit. Specific outcome, not features]
+
+[PROOF — 2-3 sentences. Specific result, testimonial placeholder, or your own story]
+
+Here's what you get:
+• [Deliverable 1 with specific outcome]
+• [Deliverable 2 with specific outcome]
+• [Deliverable 3 with specific outcome]
+
+[OFFER + URGENCY — Price, what makes it a no-brainer, any limited-time angle]
+
+[CTA BUTTON TEXT]: [Write it] → [yourlink.com]
+
+[OBJECTION HANDLER — 1-2 sentences addressing the #1 reason they won't buy]
+
+Talk soon,
+[Your name]
+
+P.S. [Write a P.S. that either adds urgency, adds a bonus, or reframes the offer]
+
+---
+## FOLLOW-UP EMAIL (3 days later if no purchase):
+Subject: [Write it]
+Body: [Write 3-4 sentence follow-up]`,
   };
-  S.scriptOuts[ch.id]=await callAI(P[ch.id],"You are an elite direct-response copywriter. Be specific and conversion-focused.");
+
+  const sys="You are a world-class direct-response copywriter and business strategist. Write detailed, specific, actionable content. No generic advice. Every word should help someone make money.";
+  S.scriptOuts[ch.id]=await callAI(P[ch.id],sys);
   S.scriptLoading[ch.id]=false;render();
 }
 
 function showScriptOut(outEl){
   if(!outEl)return;
   const ch=CHANNELS.find(c=>c.id===S.scriptActive);
-  outEl.className="glass";outEl.style.padding="18px";
+  outEl.className="glass";
+  Object.assign(outEl.style,{padding:"20px",border:"1px solid rgba(0,122,255,.2)"});
+
   if(S.scriptLoading[S.scriptActive]){
-    outEl.innerHTML=`<div style="text-align:center;padding:30px"><div style="width:32px;height:32px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div><div style="color:#007AFF;font-size:12px">Writing ${ch?.label}...</div></div>`;
-  }else if(S.scriptOuts[S.scriptActive]){
+    outEl.innerHTML=`<div style="text-align:center;padding:40px 20px">
+      <div style="width:40px;height:40px;border:3px solid rgba(0,122,255,.15);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px"></div>
+      <div style="color:#007AFF;font-size:13px;font-weight:600">Writing your ${ch?.label} with Gemini AI...</div>
+      <div style="color:#4A4A5A;font-size:11px;margin-top:6px">Crafting detailed, ready-to-post content</div>
+    </div>`;
+    return;
+  }
+
+  if(S.scriptOuts[S.scriptActive]){
+    const txt = S.scriptOuts[S.scriptActive];
     outEl.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px">AI — ${S.scriptActive.toUpperCase().replace("_"," ")}</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:3px 11px;border-radius:5px;letter-spacing:.5px">⚡ AI GENERATED — ${S.scriptActive.toUpperCase().replace("_"," ")}</span>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-g sm" id="cpAI">📋 Copy All</button>
-          <button class="btn btn-g sm" id="rgAI">🔄</button>
+          <button id="cpAI" class="btn btn-p sm">📋 Copy All</button>
+          <button id="rgAI" class="btn btn-g sm">🔄 Regenerate</button>
         </div>
       </div>
-      <pre style="font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${S.scriptOuts[S.scriptActive]}</pre>`;
-    outEl.querySelector("#cpAI").onclick=()=>navigator.clipboard.writeText(S.scriptOuts[S.scriptActive]);
-    outEl.querySelector("#rgAI").onclick=()=>{S.scriptOuts[S.scriptActive]=null;genScript(CHANNELS.find(c=>c.id===S.scriptActive),outEl)};
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px;font-size:13px;line-height:1.85;color:#D8D8E8;white-space:pre-wrap;max-height:450px;overflow:auto;font-family:-apple-system,sans-serif">${txt}</div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:#4A4A5A">${txt.length} chars · ready to post</span>
+        <span style="font-size:11px;color:#34D399">✓ Generated by Gemini AI</span>
+      </div>`;
+
+    const cpBtn=outEl.querySelector("#cpAI");
+    const rgBtn=outEl.querySelector("#rgAI");
+
+    cpBtn.onclick=()=>{
+      const copyText=S.scriptOuts[S.scriptActive]||txt;
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(copyText).then(()=>{
+          cpBtn.textContent="✓ Copied!";
+          cpBtn.style.background="#059669";
+          setTimeout(()=>{cpBtn.innerHTML="📋 Copy All";cpBtn.style.background="";},2000);
+        }).catch(()=>fallbackCopy(cpBtn,copyText));
+      } else { fallbackCopy(cpBtn,copyText); }
+    };
+
+    rgBtn.onclick=()=>{
+      S.scriptOuts[S.scriptActive]=null;
+      const activeChannel=CHANNELS.find(c=>c.id===S.scriptActive);
+      if(activeChannel) genScript(activeChannel,outEl);
+    };
   }
+}
+
+function fallbackCopy(btn,text){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); btn.textContent="✓ Copied!"; }
+  catch(e){ btn.textContent="Use Ctrl+C"; }
+  document.body.removeChild(ta);
+  setTimeout(()=>{btn.innerHTML="📋 Copy All";},2000);
 }
 
 function buildRoadmap(){
@@ -719,28 +904,241 @@ function buildDrawer(){
       </div>
     </div>`;
   box.querySelector("#closeD").onclick=()=>{S.drawer=null;render()};
-  box.querySelector("#genBtn").onclick=async()=>{
+  async function runGenerate(){
     const body=box.querySelector("#dBody");
-    body.innerHTML=`<div style="text-align:center;padding:50px"><div style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating...</div></div>`;
+    body.innerHTML=`<div style="text-align:center;padding:50px 20px">
+      <div style="width:44px;height:44px;border:3px solid rgba(0,122,255,.15);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px"></div>
+      <div style="color:#007AFF;font-size:13px;font-weight:600">Generating with Gemini AI...</div>
+      <div style="color:#4A4A5A;font-size:11px;margin-top:6px">This takes 5-10 seconds</div>
+    </div>`;
+
+    const iname = idea?.name || "your business";
+    const iusp  = idea?.usp  || "";
+
     const prompts=[
-      `Business: "${idea?.name}". Write a 6-step market validation plan with search terms, 3 subreddits to check, and 3 qualifying questions for prospects.`,
-      `Business: "${idea?.name}". Name 5 likely competitors, what differentiates my offer, and the exact positioning strategy to win.`,
-      `Business: "${idea?.name}". Write 3 irresistible offer variants — price, what is included, one-line pitch each.`,
-      `Business: "${idea?.name}". Write complete landing page copy: headline, subheadline, 3 benefit bullets, 3 FAQs, CTA text. Ready to paste.`,
-      `Business: "${idea?.name}". Exact Gumroad setup guide: product creation, pricing, checkout, first refund handling.`,
-      `Business: "${idea?.name}". Write 3 lead magnet ideas and full outline for the best one.`,
-      `Business: "${idea?.name}". Launch day war room: what to post first, metrics every 30 min, plan B if zero sales in 3 hours.`,
+      // Hour 1 — Market Validation
+      `You are an elite business strategist. My business idea: "${iname}" — ${iusp}
+
+Write a DETAILED Market Validation Plan with these exact sections:
+
+## 🔍 SEARCH TERMS TO USE
+List 6 specific search terms to check demand on Google, Reddit, and Twitter
+
+## 📱 SUBREDDITS TO CHECK
+List 5 relevant subreddits with the exact kind of post to look for in each
+
+## 💬 QUALIFYING QUESTIONS (for prospect conversations)
+Write 5 specific qualifying questions that reveal if someone would pay for this
+
+## 🟢 GREEN LIGHT SIGNALS
+List 4 specific signals that mean "proceed with launch"
+
+## 🔴 RED FLAG SIGNALS  
+List 3 warning signs that mean "pivot or stop"
+
+## ⚡ THIS WEEK'S VALIDATION ACTION
+Write ONE specific action to take TODAY to validate in under 2 hours
+
+Be specific to "${iname}" — not generic advice.`,
+
+      // Hour 2 — Competitive Analysis
+      `You are an elite business strategist. My business: "${iname}" — ${iusp}
+
+Write a DETAILED Competitive Analysis with:
+
+## 🏆 TOP 5 LIKELY COMPETITORS
+For each competitor: Name, URL, Price, Their weakness I can exploit
+
+## 💎 MY UNFAIR ADVANTAGE
+3 specific reasons why my version beats them for the right customer
+
+## 🎯 POSITIONING STATEMENT
+Write my exact positioning statement (fill-in-the-blank style):
+"For [target customer] who [problem], ${iname} is the [category] that [key benefit] unlike [competitor] which [their weakness]"
+
+## 💰 PRICING STRATEGY
+Recommended price point with justification — compare to alternatives
+
+## 📣 ONE-LINER PITCH
+The single best sentence to describe this to a stranger in 10 seconds`,
+
+      // Hour 3 — Offer Creation
+      `You are an elite business strategist. My business: "${iname}" — ${iusp}
+
+Design 3 IRRESISTIBLE OFFER TIERS:
+
+## 🥉 STARTER OFFER — "$[X]"
+- Exact deliverable (what they get)
+- Time to deliver
+- Best for: [customer type]
+- One-line sales pitch
+
+## 🥇 PRO OFFER — "$[X]" ← RECOMMENDED LAUNCH PRICE
+- Exact deliverable (what they get)  
+- Time to deliver
+- Best for: [customer type]
+- One-line sales pitch
+- Why this price is a no-brainer
+
+## 💎 PREMIUM OFFER — "$[X]"
+- Exact deliverable (what they get)
+- Time to deliver
+- Best for: [customer type]
+- One-line sales pitch
+
+## 🛡️ GUARANTEE
+Write the exact guarantee to remove all buying risk
+
+## 🚀 LAUNCH RECOMMENDATION
+Which tier to launch with and why`,
+
+      // Hour 4 — Landing Page
+      `You are an elite conversion copywriter. My business: "${iname}" — ${iusp}
+
+Write COMPLETE LANDING PAGE COPY ready to paste into Carrd.co:
+
+## 🎯 HERO SECTION
+**Headline:** [write it]
+**Subheadline:** [write it]
+**CTA Button Text:** [write it]
+
+## ✅ 3 BENEFIT BULLETS
+1. [Benefit with specific outcome]
+2. [Benefit with specific outcome]  
+3. [Benefit with specific outcome]
+
+## 💬 SOCIAL PROOF PLACEHOLDER
+Write 2 fake-but-realistic testimonials to use as placeholders until you get real ones
+
+## ❓ FAQ SECTION (3 questions)
+Q: [Most common objection]
+A: [Answer that removes the objection]
+
+Q: [Second objection]
+A: [Answer]
+
+Q: [Third objection]
+A: [Answer]
+
+## 📧 EMAIL CAPTURE HEADLINE
+One line to get someone to give their email in exchange for a freebie`,
+
+      // Hour 5 — Payment Setup
+      `You are a product launch expert. My business: "${iname}" — ${iusp}
+
+Write a COMPLETE GUMROAD SETUP GUIDE:
+
+## 📦 STEP 1: CREATE YOUR PRODUCT
+- Product type to select and why
+- Exact product name to use
+- Price to set (and what discount to offer first 10 buyers)
+- Description template (write the actual description)
+
+## 🖼️ STEP 2: COVER IMAGE
+- Exact dimensions (pixels)
+- What to put on it (text, colors)
+- Free tool to make it in 15 min
+
+## ⚙️ STEP 3: SETTINGS TO CONFIGURE
+List every important setting with what to set it to
+
+## 🔗 STEP 4: YOUR CHECKOUT LINK
+How to find it and where to share it first
+
+## ✉️ STEP 5: THANK YOU PAGE
+What to put on it (including your GitHub Pages URL)
+
+## 🧪 STEP 6: TEST YOUR CHECKOUT
+Exact steps to test the full purchase flow before going live
+
+## 💸 FIRST SALE STRATEGY
+One specific action to get your first $49 payment TODAY`,
+
+      // Hour 6 — Lead Magnet
+      `You are a content marketing expert. My business: "${iname}" — ${iusp}
+
+Design the PERFECT LEAD MAGNET:
+
+## 🏆 TOP 3 LEAD MAGNET IDEAS
+For each: Title, Format, Time to create, Why it works, Who it attracts
+
+## 📋 FULL OUTLINE: BEST OPTION
+Write the complete outline for the #1 recommended lead magnet:
+- Title
+- Subtitle  
+- Section 1: [title + 3 bullet points]
+- Section 2: [title + 3 bullet points]
+- Section 3: [title + 3 bullet points]
+- Call to Action at end
+
+## 🎨 DESIGN BRIEF
+- Tool to use (Canva template type)
+- Color scheme
+- Key visual element
+
+## 📢 DISTRIBUTION PLAN
+Where to share this lead magnet in the first 24 hours (5 specific places)
+
+## ✉️ FOLLOW-UP EMAIL
+Write the exact email to send when someone downloads it`,
+
+      // Hour 7 — Launch Day
+      `You are a launch strategist. My business: "${iname}" — ${iusp}
+
+Write the COMPLETE LAUNCH DAY WAR ROOM PLAN:
+
+## ⏰ HOUR-BY-HOUR SCHEDULE
+09:00 — [specific action]
+10:00 — [specific action]
+11:00 — [specific action]
+12:00 — [specific action]
+14:00 — [specific action]
+16:00 — [specific action]
+18:00 — [specific action]
+20:00 — [specific action]
+
+## 📊 METRICS TO TRACK (check every 30 min)
+List 5 specific numbers to watch and what each means
+
+## 🟢 SUCCESS SIGNALS
+What does a good launch look like at: 3 hours / 6 hours / 24 hours?
+
+## 🚨 ZERO SALES AFTER 3 HOURS — ACTION PLAN
+Step 1: [do this]
+Step 2: [do this]
+Step 3: [do this]
+
+## 💬 EXACT DM SCRIPT
+Write the exact cold DM to send to 10 people RIGHT NOW to get first sale`,
     ];
-    const result=await callAI(prompts[t.idx]||prompts[0]);
+
+    const result = await callAI(prompts[t.idx] || prompts[0]);
+    
+    // Store result for copy button
+    box._lastResult = result;
+
     body.innerHTML=`
-      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px;font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${result}</div>
-      <div style="display:flex;gap:10px;margin-top:14px">
-        <button class="btn btn-g sm" id="cpD">📋 Copy All</button>
-        <button class="btn btn-g sm" id="rgD">🔄 Regenerate</button>
+      <div id="aiResult" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;font-size:13px;line-height:1.8;color:#D0D0E0;white-space:pre-wrap;max-height:400px;overflow:auto;font-family:-apple-system,sans-serif">${result}</div>
+      <div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+        <button class="btn btn-p sm" id="cpD" style="display:flex;align-items:center;gap:6px">📋 Copy All</button>
+        <button class="btn btn-g sm" id="rgD" style="display:flex;align-items:center;gap:6px">🔄 Regenerate</button>
+        <span style="font-size:11px;color:#4A4A5A;margin-left:auto">${result.length} characters</span>
       </div>`;
-    body.querySelector("#cpD").onclick=()=>navigator.clipboard.writeText(result);
-    body.querySelector("#rgD").onclick=()=>box.querySelector("#genBtn").click();
-  };
+
+    const cpBtn = body.querySelector("#cpD");
+    const rgBtn = body.querySelector("#rgD");
+    
+    cpBtn.onclick=()=>{
+      navigator.clipboard.writeText(box._lastResult||result).then(()=>{
+        cpBtn.textContent="✓ Copied!";
+        cpBtn.style.background="#059669";
+        setTimeout(()=>{cpBtn.innerHTML="📋 Copy All";cpBtn.style.background="";},2000);
+      });
+    };
+    rgBtn.onclick=()=>runGenerate();
+  }
+
+  box.querySelector("#genBtn").onclick=()=>runGenerate();
   ov.appendChild(box);return ov;
 }
 
