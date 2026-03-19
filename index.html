@@ -3,160 +3,106 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚡ Execution OS</title>
+<title>⚡ Execution OS — AI Profit Engine</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#0A0A0B;color:#F0F0F5;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif}
-*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
-a{color:inherit;text-decoration:none}
-input,textarea,button{font-family:inherit}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0A0A0B;color:#F0F0F5;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+a{color:inherit;text-decoration:none}button,input,textarea{font-family:inherit}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes nuclearPulse{0%,100%{box-shadow:0 0 30px rgba(239,68,68,.5),0 0 70px rgba(239,68,68,.2)}50%{box-shadow:0 0 70px rgba(239,68,68,.9),0 0 140px rgba(239,68,68,.4)}}
-@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(0,122,255,0)}50%{box-shadow:0 0 30px rgba(0,122,255,.25)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes nuclearPulse{0%,100%{box-shadow:0 0 30px rgba(239,68,68,.5),0 0 70px rgba(239,68,68,.2)}50%{box-shadow:0 0 80px rgba(239,68,68,.9),0 0 160px rgba(239,68,68,.4)}}
 @keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-
-/* Layout */
-#app{height:100vh;display:flex;flex-direction:column}
-.dashboard{height:100vh;display:flex;overflow:hidden}
-.sidebar{width:210px;flex-shrink:0;background:#0F0F13;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{height:54px;background:rgba(10,10,11,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;position:sticky;top:0;z-index:50}
-.content{flex:1;overflow:auto;padding:26px 22px}
-
-/* Glass card */
-.glass{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;backdrop-filter:blur(20px)}
-
-/* Buttons */
-.btn{border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;padding:11px 22px;transition:all .15s;letter-spacing:.3px;font-family:inherit}
-.btn-primary{background:linear-gradient(135deg,#007AFF,#0055FF);color:#fff;box-shadow:0 4px 20px rgba(0,122,255,.3)}
-.btn-ghost{background:rgba(255,255,255,.05);color:#9191A4;border:1px solid rgba(255,255,255,.07)}
-.btn-success{background:linear-gradient(135deg,#34D399,#059669);color:#fff}
-.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff}
-.btn-sm{padding:8px 14px;font-size:12px}
-.btn-lg{padding:16px 40px;font-size:16px}
+@keyframes glowBorder{0%,100%{box-shadow:0 0 0 rgba(0,122,255,0)}50%{box-shadow:0 0 28px rgba(0,122,255,.3)}}
+.glass{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px}
+.btn{border:none;border-radius:10px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* Badge */
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.8px}
-
-/* Nav */
-.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:#9191A4;font-weight:500;font-size:13px;transition:all .15s;text-align:left;width:100%;font-family:inherit}
-.nav-btn.active{background:rgba(0,122,255,.12);color:#007AFF;font-weight:700}
-
-/* Modal overlay */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(12px)}
-.modal{background:#0A0A0F;border:1px solid rgba(0,122,255,.35);border-radius:24px;width:100%;max-width:860px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 100px rgba(0,122,255,.12)}
-
-/* Progress bar */
-.prog-wrap{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
-.prog-bar{height:100%;border-radius:3px;transition:width .5s ease}
-
-/* Task card */
-.task-card{padding:16px 20px;transition:all .3s;cursor:default}
-.task-card.active-card{animation:glow 3s ease-in-out infinite}
-
-/* Confetti */
-.cf-piece{position:fixed;top:-12px;pointer-events:none;border-radius:50%;animation:cfFall linear forwards}
-
-/* Spinner */
-.spinner{border-radius:50%;animation:spin .7s linear infinite}
-
-/* Textarea */
-textarea{resize:none;outline:none;background:transparent;border:none;color:#C8C8D0;font-size:14px;line-height:1.75;padding:18px;width:100%;font-family:'SF Mono','Fira Code',monospace}
-
-/* Input */
-.field{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:15px 18px;font-size:15px;color:#F0F0F5;outline:none;transition:border-color .2s;font-family:inherit}
-.field:focus{border-color:#007AFF}
-
-/* Grid */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-.grid-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
-
-/* Onboarding */
-.onboard{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;background:radial-gradient(ellipse at 50% 30%,rgba(0,122,255,.07) 0%,transparent 60%)}
-
-pre{white-space:pre-wrap;word-break:break-word}
+.btn-p{background:linear-gradient(135deg,#007AFF,#0055FF);color:#fff;padding:11px 22px;font-size:13px;box-shadow:0 4px 20px rgba(0,122,255,.3)}
+.btn-g{background:rgba(255,255,255,.05);color:#9191A4;border:1px solid rgba(255,255,255,.08);padding:11px 22px;font-size:13px}
+.btn-s{background:linear-gradient(135deg,#34D399,#059669);color:#fff;padding:11px 22px;font-size:13px}
+.sm{padding:8px 14px!important;font-size:12px!important}
+.lg{padding:16px 40px!important;font-size:16px!important}
+.sidebar{width:210px;flex-shrink:0;background:#0F0F13;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.nav-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;border:none;cursor:pointer;background:transparent;color:#9191A4;font-weight:500;font-size:13px;transition:all .15s;text-align:left;width:100%}
+.nav-item.on{background:rgba(0,122,255,.12);color:#007AFF;font-weight:700}
+.topbar{height:54px;background:rgba(10,10,11,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:50;flex-shrink:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.pt{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.pf{height:100%;border-radius:3px;transition:width .5s ease}
 </style>
 </head>
 <body>
-<div id="app"></div>
-
+<div id="R"></div>
 <script>
-// ═══════════════════════════════════════════════════
-//  EXECUTION OS — Pure Vanilla JS
-//  GAS URL pre-configured
-// ═══════════════════════════════════════════════════
+const GAS="https://script.google.com/macros/s/AKfycbw05ABBcpVEtdS-NljdYopE3asDzeYAhTUZannmAd5ieizfQShO-z4SA7jjq7ezd8l_/exec";
+const CAPI="https://api.anthropic.com/v1/messages";
+const MDL="claude-sonnet-4-20250514";
 
-const GAS = "https://script.google.com/macros/s/AKfycbw05ABBcpVEtdS-NljdYopE3asDzeYAhTUZannmAd5ieizfQShO-z4SA7jjq7ezd8l_/exec";
-const CLAUDE = "claude-sonnet-4-20250514";
-
-// ── DATA ─────────────────────────────────────────
-const IDEAS = [
-  {id:"B001",cat:"B2B SaaS",name:"AI Inventory Demand Predictor",usp:"Reduces overstock 40% using ML for Shopify stores",diff:3,launch:"H1: Sign up Replit+Supabase\nH2: Connect Shopify API\nH3: Train model on demo data\nH4: Build dashboard UI\nH5: Create Stripe billing\nH6: List on AppSumo\nH7: Cold email 20 stores",scripts:"REDDIT: 'I predicted Q4 stockouts 3 weeks early'\nTWITTER: 'The $50K mistake most Shopify stores make'\nCOLD DM: 'Do you have inventory buffer logic for peak season?'",scale:"W1:10 beta free\nW2:Case study\nW3:ProductHunt\nW4:$97/mo\nM2:Agency partners\nM3:Multi-platform",conf:95},
-  {id:"H001",cat:"Digital Services",name:"AI Podcast Clip Service",usp:"Turns 1 podcast into 30 viral clips — done for you",diff:2,launch:"H1: Descript/Opus setup\nH2: Caption generator\nH3: Hook analyzer prompt\nH4: Drive delivery\nH5: $500/mo pricing\nH6: DM 20 podcasters\nH7: Post before/after",scripts:"TWITTER: 'Turned a 2-hr podcast into 34 viral clips in 3hrs'\nCOLD DM: 'Your content dies after 48hrs. I make 30 clips/month. Free samples?'",scale:"W1:3 free trials\nW2:Results reel\nW3:$799/mo\nW4:Hire VA\nM2:YouTube Shorts\nM3:$1,500 bundle",conf:91},
-  {id:"M001",cat:"Niche Content",name:"AI Legal Compliance Newsletter",usp:"Weekly law changes per US state — sold to HR managers",diff:2,launch:"H1: Legal RSS feeds\nH2: Claude pipeline\nH3: Beehiiv setup\nH4: $49/mo sub\nH5: Carrd landing page\nH6: HR Facebook groups\nH7: Cold email 30 HR managers",scripts:"LINKEDIN: 'HR: 3 compliance changes last month affected your handbook'\nTWITTER: 'Employment law changes 400+ times/year. We track every one.'",scale:"W1:100 free subs\nW2:$29/mo\nW3:$49/mo\nW4:Second state\nM2:10 states\nM3:Law firm white-label",conf:88},
-  {id:"R001",cat:"Real Estate AI",name:"AI Fix-and-Flip ROI Calculator",usp:"ARV, repair costs, profit margin in 60 seconds",diff:3,launch:"H1: Attom API\nH2: Repair cost model\nH3: ARV calculator\nH4: Report dashboard\nH5: $49/mo\nH6: BiggerPockets thread\nH7: DM 30 investors",scripts:"TWITTER: 'Analyzed 200 fix-and-flip deals. 5 categories kill most profits.'\nREDDIT: 'Fix-and-flip ROI in 60 seconds. Free analysis:'",scale:"W1:50 free\nW2:$29/mo\nW3:$49/mo\nW4:Contractor network\nM2:REIA clubs\nM3:Lender deals",conf:85},
-  {id:"P001",cat:"AI Utilities",name:"AI Career Pivot Coach",usp:"90-day plan for laid-off tech workers — resume+skill gap+jobs",diff:2,launch:"H1: Assessment form\nH2: Role matching\nH3: Skill gap analyzer\nH4: Claude plan gen\nH5: $199 one-time\nH6: r/layoffs post\nH7: DM workers on LinkedIn",scripts:"LINKEDIN: '90-day pivot framework used by 47 engineers after FAANG'\nREDDIT: 'Used AI to map my pivot. Better job, higher salary.'",scale:"W1:20 free\nW2:$99\nW3:$199\nW4:Resume add-on\nM2:Coaching community\nM3:Bootcamp deal",conf:82},
-  {id:"B002",cat:"B2B SaaS",name:"AI Contract Risk Analyzer",usp:"Scans NDAs in 60 seconds, flags 23 risk categories",diff:3,launch:"H1: Claude API\nH2: PDF parser\nH3: Risk prompts\nH4: Upload UI\nH5: $29/scan\nH6: r/freelance\nH7: Email Upwork freelancers",scripts:"REDDIT: 'Found $12K liability clause the lawyer missed'\nCOLD DM: 'Freelancers lose thousands to bad contracts. AI catches them fast.'",scale:"W1:100 free\nW2:Freelancer groups\nW3:$49/mo\nW4:E-signature\nM2:Law white-label\nM3:Enterprise $499",conf:93},
-  {id:"H002",cat:"Digital Services",name:"AI LinkedIn Ghostwriting",usp:"15-min interview → 20 posts + newsletter + content calendar",diff:2,launch:"H1: Tally intake\nH2: Extraction prompt\nH3: Scheduling system\nH4: Approval workflow\nH5: $1,500/mo\nH6: DM 15 CEOs\nH7: Post case study",scripts:"LINKEDIN: 'I write content for 7-figure executives. Consistency wins.'\nCOLD DM: 'You post once/6 weeks. I help you post daily — 15 min/week from you.'",scale:"W1:2 clients $1K\nW2:Systematize\nW3:$1,500/mo\nW4:Junior writer\nM2:5 clients $7.5K\nM3:Agency model",conf:90},
-  {id:"P002",cat:"AI Utilities",name:"AI Executive Coaching Chat",usp:"24/7 AI coach — leadership, promotion strategy, communication",diff:2,launch:"H1: Framework\nH2: System prompt\nH3: Chat interface\nH4: Memory system\nH5: $79/mo\nH6: r/managers\nH7: DM HR professionals",scripts:"LINKEDIN: 'Executive coaches charge $500/hr. Built AI version for $79/mo'\nREDDIT: 'Asked AI exec coach about a difficult skip-level. Here is what it said.'",scale:"W1:50 free\nW2:$39/mo\nW3:$79/mo\nW4:Team plans\nM2:L&D deals\nM3:Corporate licensing",conf:83},
+const IDEAS=[
+  {id:"B001",cat:"B2B SaaS",name:"AI Inventory Predictor",usp:"Cuts overstock 40% for Shopify stores using ML forecasting",diff:3,scripts:"REDDIT: 'I predicted Q4 stockouts 3 weeks early — here is how'\nTWITTER: 'The $50K mistake most Shopify stores make in Q4'\nCOLD DM: 'Do you have inventory buffer logic for peak season?'",scale:"W1:10 beta free → W2:Case study → W3:ProductHunt → W4:$97/mo → M2:Agency deals → M3:Multi-platform"},
+  {id:"H001",cat:"Digital Service",name:"AI Podcast Clip Service",usp:"Turns 1 podcast into 30 viral clips — fully done for you",diff:2,scripts:"TWITTER: 'Turned 2-hr podcast into 34 viral clips in 3 hours'\nCOLD DM: 'Your content dies after 48hrs. I repurpose it into 30 clips/mo. Want 5 free?'",scale:"W1:3 free trials → W2:Results reel → W3:$799/mo → W4:Hire VA → M2:YT Shorts → M3:$1,500 bundle"},
+  {id:"M001",cat:"Niche Content",name:"AI Legal Newsletter",usp:"Weekly US state employment law changes — sold to HR managers",diff:2,scripts:"LINKEDIN: 'HR: 3 compliance changes last month hit your handbook'\nTWITTER: 'Employment law changes 400+ times/year. We track every one.'",scale:"W1:100 free → W2:$29/mo → W3:$49/mo → W4:2nd state → M2:10 states → M3:Law firm white-label"},
+  {id:"R001",cat:"Real Estate AI",name:"Fix-and-Flip ROI Calculator",usp:"ARV + repair costs + profit margin in 60 seconds",diff:3,scripts:"TWITTER: 'Analyzed 200 flip deals. 5 cost categories kill profits.'\nREDDIT: 'Fix-and-flip ROI calculator — free analysis inside'",scale:"W1:50 free → W2:$29/mo → W3:$49/mo → W4:Contractor network → M2:REIA clubs"},
+  {id:"P001",cat:"AI Utility",name:"AI Career Pivot Coach",usp:"90-day plan for laid-off tech workers — resume + skill gap + jobs",diff:2,scripts:"LINKEDIN: '90-day pivot framework used by 47 engineers post-FAANG layoffs'\nREDDIT: 'Used AI to map my career pivot. Better job, higher pay. Full plan:'",scale:"W1:20 free → W2:$99 → W3:$199 → W4:Resume add-on → M2:Coaching community"},
+  {id:"B002",cat:"B2B SaaS",name:"AI Contract Analyzer",usp:"Scans NDAs in 60 seconds, flags 23 risk categories",diff:3,scripts:"REDDIT: 'AI found $12K liability clause my lawyer missed'\nCOLD DM: 'Freelancers lose thousands to bad contracts. Our AI catches them in 60s.'",scale:"W1:100 free scans → W2:Freelancer communities → W3:$49/mo → W4:E-sign integration"},
+  {id:"H002",cat:"Digital Service",name:"LinkedIn Ghostwriting",usp:"15-min CEO interview → 20 posts + newsletter + full calendar",diff:2,scripts:"LINKEDIN: 'I write content for 7-figure executives. Consistency is everything.'\nCOLD DM: 'You post once every 6 weeks. I help executives post daily — 15 min/wk from you.'",scale:"W1:2 clients $1K → W2:Systematize → W3:$1,500/mo → W4:Junior writer → M2:5 clients $7.5K MRR"},
+  {id:"P002",cat:"AI Utility",name:"AI Executive Coach Chat",usp:"24/7 AI coach — leadership, promotion strategy, tough conversations",diff:2,scripts:"LINKEDIN: 'Executive coaches charge $500/hr. Built an AI version for $79/mo.'\nREDDIT: 'Asked AI exec coach a hard skip-level question. Here is what it said.'",scale:"W1:50 free → W2:$39/mo → W3:$79/mo → W4:Team plans → M2:L&D department deals"},
+  {id:"M002",cat:"Niche Content",name:"AI Restaurant Intelligence",usp:"Weekly menu pricing + labor benchmarks for independent owners",diff:2,scripts:"FACEBOOK: 'Food costs in your city up 8% — these items need repricing now'\nEMAIL: 'Your burger margins are 3% below city average — here is the fix'",scale:"W1:100 free → W2:$29/mo → W3:$49/mo → W4:POS integrations → M2:Food supplier deals"},
+  {id:"R002",cat:"Real Estate AI",name:"AI Airbnb Optimizer",usp:"Dynamic pricing + listing optimization — increases STR revenue 20-35%",diff:3,scripts:"TWITTER: 'My Airbnb revenue up 31% after switching to AI dynamic pricing'\nREDDIT: 'Analyzed 500 STR listings. Top 10% do these 3 things differently.'",scale:"W1:10 free → W2:$99/mo → W3:$199/mo → W4:Property manager tier → M2:STR mgmt company deals"},
 ];
 
-const TASKS = {
+const TASKS={
   p1:[
-    {k:"t1",slot:"Hour 1",task:"Market Validation",action:"Research demand on Reddit, Twitter, Google Trends",tool:"Google Trends",done:false},
-    {k:"t2",slot:"Hour 2",task:"Competitive Analysis",action:"Find 5 competitors, document pricing gaps",tool:"Similarweb",done:false},
-    {k:"t3",slot:"Hour 3",task:"Offer Creation",action:"Define offer, pricing tiers, guarantee",tool:"Google Docs",done:false},
-    {k:"t4",slot:"Hour 4",task:"Landing Page",action:"Headline, 3 bullets, CTA — live in 1 hour",tool:"Carrd.co",done:false},
-    {k:"t5",slot:"Hour 5",task:"Payment Setup",action:"Create product in Gumroad, test checkout",tool:"Gumroad",done:false},
-    {k:"t6",slot:"Hour 6",task:"Lead Magnet",action:"Create a free resource for ideal customers",tool:"Canva",done:false},
-    {k:"t7",slot:"Hour 7",task:"First Distribution",action:"Post on 3 platforms, DM 10 prospects",tool:"Twitter+Reddit",done:false},
+    {k:"t1",slot:"Hour 1",task:"Market Validation",action:"Research demand on Reddit, Twitter, Google Trends",tool:"Google Trends"},
+    {k:"t2",slot:"Hour 2",task:"Competitive Analysis",action:"Find 5 competitors, document their gaps and pricing",tool:"Similarweb"},
+    {k:"t3",slot:"Hour 3",task:"Craft Your Offer",action:"Define offer, pricing tiers, and money-back guarantee",tool:"Google Docs"},
+    {k:"t4",slot:"Hour 4",task:"Build Landing Page",action:"Headline + 3 bullets + CTA button — live in 1 hour",tool:"Carrd.co"},
+    {k:"t5",slot:"Hour 5",task:"Setup Payments",action:"Create product in Gumroad, test full checkout flow",tool:"Gumroad"},
+    {k:"t6",slot:"Hour 6",task:"Create Lead Magnet",action:"Free resource that attracts your exact ideal customer",tool:"Canva"},
+    {k:"t7",slot:"Hour 7",task:"First Distribution",action:"Post on 3 platforms + send 10 personalized DMs",tool:"Twitter + Reddit"},
   ],
   p2:[
-    {k:"t8",slot:"Morning",task:"Reddit Launch Post",action:"Story-first post on 3 subreddits",tool:"Reddit",done:false},
-    {k:"t9",slot:"Noon",task:"Twitter Thread",action:"8-tweet thread on core problem",tool:"Twitter/X",done:false},
-    {k:"t10",slot:"Afternoon",task:"Cold DM Campaign",action:"20 personalized DMs to ideal customers",tool:"LinkedIn DM",done:false},
-    {k:"t11",slot:"Evening",task:"LinkedIn Post",action:"Case study or insight about your niche",tool:"LinkedIn",done:false},
-    {k:"t12",slot:"Night",task:"Follow-up Sequence",action:"Email signups, pitch early-bird pricing",tool:"Beehiiv",done:false},
+    {k:"t8",slot:"Morning",task:"Reddit Launch Post",action:"Story-first post on 3 relevant subreddits",tool:"Reddit"},
+    {k:"t9",slot:"Noon",task:"Twitter Thread",action:"8-tweet thread on the core problem you solve",tool:"Twitter/X"},
+    {k:"t10",slot:"Afternoon",task:"Cold DM Blitz",action:"20 personalized DMs to ideal customers",tool:"LinkedIn DM"},
+    {k:"t11",slot:"Evening",task:"LinkedIn Post",action:"Case study or insight about your niche",tool:"LinkedIn"},
+    {k:"t12",slot:"Night",task:"Email Signups",action:"Send offer to list with early-bird pricing",tool:"Beehiiv"},
   ],
   p3:[
-    {k:"t13",slot:"Day 1-2",task:"Optimize Landing Page",action:"Improve headline based on feedback",tool:"Carrd/Hotjar",done:false},
-    {k:"t14",slot:"Day 3",task:"First Customer Call",action:"Call first customer, gather raw feedback",tool:"Zoom",done:false},
-    {k:"t15",slot:"Day 4-5",task:"Collect Testimonials",action:"Request written/video testimonials",tool:"Tally.so",done:false},
-    {k:"t16",slot:"Day 6",task:"Content Blitz",action:"Post 2x daily, highlight results",tool:"Buffer",done:false},
-    {k:"t17",slot:"Day 7",task:"Revenue Review",action:"Calculate MRR, find top channel",tool:"Stripe",done:false},
+    {k:"t13",slot:"Day 1-2",task:"Optimize Page",action:"Rewrite headline based on Day 1 prospect feedback",tool:"Carrd"},
+    {k:"t14",slot:"Day 3",task:"Customer Call",action:"Call first buyer, collect raw honest feedback",tool:"Zoom"},
+    {k:"t15",slot:"Day 4-5",task:"Get Testimonials",action:"Request written or video testimonials",tool:"Tally.so"},
+    {k:"t16",slot:"Day 6",task:"Content Blitz",action:"Post 2x daily highlighting customer results",tool:"Buffer"},
+    {k:"t17",slot:"Day 7",task:"Revenue Review",action:"Calculate MRR, identify top acquisition channel",tool:"Stripe"},
   ],
   p4:[
-    {k:"t18",slot:"Week 2",task:"Scale Top Channel",action:"Post 2x daily on winning channel",tool:"Buffer",done:false},
-    {k:"t19",slot:"Week 2-3",task:"Build Email List",action:"Capture emails, 5-email nurture sequence",tool:"Beehiiv",done:false},
-    {k:"t20",slot:"Week 3",task:"Raise Prices",action:"Increase price 30-50% on demand signals",tool:"Gumroad",done:false},
-    {k:"t21",slot:"Week 4",task:"Automate & Delegate",action:"Hire VA, document SOPs in Notion",tool:"Notion+Loom",done:false},
+    {k:"t18",slot:"Week 2",task:"Scale Top Channel",action:"Post 2x daily on your single winning channel",tool:"Buffer"},
+    {k:"t19",slot:"Week 2-3",task:"Build Email List",action:"Capture emails, launch 5-email nurture sequence",tool:"Beehiiv"},
+    {k:"t20",slot:"Week 3",task:"Raise Prices",action:"Increase price 30-50% based on real demand signals",tool:"Gumroad"},
+    {k:"t21",slot:"Week 4",task:"Automate & Hire",action:"Hire first VA, document SOPs in Notion",tool:"Notion + Loom"},
   ],
 };
 
-const PHASE_META = [
-  {key:"p1",label:"7-Hour Launch",short:"7H",color:"#007AFF"},
-  {key:"p2",label:"24-Hour Distrib",short:"24H",color:"#34D399"},
-  {key:"p3",label:"7-Day Growth",short:"7D",color:"#F59E0B"},
-  {key:"p4",label:"30-Day Scale",short:"30D",color:"#EC4899"},
+const QS=[
+  {q:"What is your primary skill?",icon:"🧠",opts:["Coding / Tech","Copywriting / Writing","Video / Design","Sales / Marketing","Finance / Consulting","Operations / Systems"]},
+  {q:"Who do you want to serve?",icon:"🎯",opts:["E-commerce Brands","SaaS Startups","Coaches & Creators","Real Estate Investors","Small Businesses","Freelancers"]},
+  {q:"Preferred business format?",icon:"⚙️",opts:["Done-For-You Service","SaaS / Software","Newsletter / Content","Online Course","Templates","Consulting"]},
+  {q:"Time available per week?",icon:"⏱️",opts:["Under 5 hours","5–10 hours","10–20 hours","20–40 hours","Full-time","Flexible"]},
+  {q:"Revenue goal in 30 days?",icon:"💰",opts:["$500–$1,000","$1,000–$3,000","$3,000–$5,000","$5,000–$10,000","$10,000+","Just starting"]},
 ];
 
-const QUESTIONS = [
-  {q:"What is your primary skill or expertise?",icon:"🧠",opts:["Coding / Tech","Copywriting / Writing","Video / Design","Sales / Marketing","Finance / Consulting","Operations / Systems"]},
-  {q:"Who do you most want to serve?",icon:"🎯",opts:["E-commerce Brands","SaaS / Tech Startups","Coaches & Creators","Real Estate Investors","Small Businesses","Freelancers / Solopreneurs"]},
-  {q:"What is your preferred business format?",icon:"⚙️",opts:["Done-For-You Service","SaaS / Software Tool","Newsletter / Content","Online Course","Templates / Products","Consulting / Strategy"]},
-  {q:"How much time can you invest per week?",icon:"⏱️",opts:["Under 5 hours","5–10 hours","10–20 hours","20–40 hours","Full-time (40hrs+)","Flexible / Varies"]},
-  {q:"What is your revenue goal in 30 days?",icon:"💰",opts:["$500 – $1,000","$1,000 – $3,000","$3,000 – $5,000","$5,000 – $10,000","$10,000+","Just getting started"]},
+const CHANNELS=[
+  {id:"reddit",label:"Reddit Post",icon:"🔴",color:"#FF4500"},
+  {id:"twitter",label:"Twitter Thread",icon:"𝕏",color:"#1D9BF0"},
+  {id:"cold_dm",label:"Cold DM Script",icon:"💬",color:"#007AFF"},
+  {id:"linkedin",label:"LinkedIn Post",icon:"in",color:"#0A66C2"},
+  {id:"email",label:"Launch Email",icon:"✉",color:"#34D399"},
 ];
 
-const RESOURCES = [
+const RES=[
   {n:"Looka",u:"https://looka.com",i:"🎨",d:"AI Logo"},
   {n:"Namecheap",u:"https://namecheap.com",i:"🌐",d:"Domain"},
-  {n:"Vercel",u:"https://vercel.com",i:"☁️",d:"Hosting"},
+  {n:"Vercel",u:"https://vercel.com",i:"☁️",d:"Free Hosting"},
   {n:"Gumroad",u:"https://gumroad.com",i:"💳",d:"Payments"},
   {n:"Carrd",u:"https://carrd.co",i:"📄",d:"Landing Page"},
   {n:"Beehiiv",u:"https://beehiiv.com",i:"📧",d:"Email List"},
@@ -172,1002 +118,625 @@ const RESOURCES = [
   {n:"Plausible",u:"https://plausible.io",i:"📊",d:"Analytics"},
 ];
 
-// ── STATE ─────────────────────────────────────────
-const S = {
-  page: "home",      // home | dashboard
-  tab: "launch",
-  idea: null,
-  taskDone: {},
-  launched: false,
-  notes: "# My Launch Notes\n\nCapture ideas, wins, blockers here...\n\n## Today\n- [ ] Complete Hour 1-3\n- [ ] Post on 2 channels\n\n## Wins\n\n## Blockers\n",
-  notesSaved: true,
-  modalOpen: false,
-  drawerTask: null,
-  qaStep: 0,
-  qaAnswers: {},
-  qaIdeas: [],
-  qaLoading: false,
-  scriptActive: null,
-  scriptOuts: {},
-  scriptLoading: {},
-};
+const PH=[
+  {key:"p1",label:"7-Hour Launch",short:"7H",color:"#007AFF"},
+  {key:"p2",label:"24-Hr Distrib",short:"24H",color:"#34D399"},
+  {key:"p3",label:"7-Day Growth",short:"7D",color:"#F59E0B"},
+  {key:"p4",label:"30-Day Scale",short:"30D",color:"#EC4899"},
+];
 
-let notesTimer = null;
+// STATE
+const S={page:"home",tab:"launch",idea:null,taskDone:{},launched:false,
+  notes:"# My Launch Notes\n\n## Today\n- [ ] Complete Hour 1-3\n- [ ] Post on 2 channels\n\n## Wins\n\n## Blockers\n",
+  notesSaved:true,modal:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false,
+  drawer:null,scriptActive:null,scriptOuts:{},scriptLoading:{}};
 
-function setState(updates) {
-  Object.assign(S, updates);
-  render();
+let notesTimer=null;
+
+async function gasPost(b){try{const r=await fetch(GAS,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});return r.json();}catch{return{success:false}}}
+
+async function callAI(prompt,sys){
+  try{
+    const r=await fetch(CAPI,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:MDL,max_tokens:900,
+        system:sys||"You are an elite business strategist. Be concise, numbered, actionable.",
+        messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    return d.content?.[0]?.text||"Error — please try again.";
+  }catch{return "Connection error — please try again."}
 }
 
-// ── HELPERS ───────────────────────────────────────
-async function gasPost(body) {
-  try {
-    const r = await fetch(GAS, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
-    return r.json();
-  } catch(e) { return {success:false}; }
+function q(sel,ctx){return(ctx||document).querySelector(sel)}
+function qq(sel,ctx){return(ctx||document).querySelectorAll(sel)}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e}
+
+function totalDone(){return Object.values(S.taskDone).filter(Boolean).length}
+function totalTasks(){return Object.values(TASKS).flat().length}
+function p1d(){return TASKS.p1.filter(t=>S.taskDone[t.k]).length}
+function pct(){return Math.round(totalDone()/totalTasks()*100)||0}
+
+function pie(p,col,sz=60){
+  const r=sz/2-6,cx=sz/2,cy=sz/2,a=(p/100)*2*Math.PI;
+  const x2=cx+r*Math.sin(a),y2=cy-r*Math.cos(a),ir=r-10;
+  const arc=p>=99?`M${cx} ${cy-r} A${r} ${r} 0 1 1 ${cx-.01} ${cy-r}Z M${cx} ${cy-ir} A${ir} ${ir} 0 1 0 ${cx-.01} ${cy-ir}Z`
+    :p<=0?"":`M${cx} ${cy-r} A${r} ${r} 0 ${a>Math.PI?1:0} 1 ${x2} ${y2} L${cx+ir*Math.sin(a)} ${cy-ir*Math.cos(a)} A${ir} ${ir} 0 ${a>Math.PI?1:0} 0 ${cx} ${cy-ir}Z`;
+  return `<svg width="${sz}" height="${sz}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10"/>${p>0?`<path d="${arc}" fill="${col}"/>`:""}
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="-apple-system,sans-serif">${p}%</text></svg>`;
 }
 
-async function askClaude(prompt, sys) {
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        model: CLAUDE, max_tokens: 900,
-        system: sys || "You are an elite business strategist. Be concise and actionable.",
-        messages: [{role:"user", content:prompt}]
-      })
-    });
-    const d = await r.json();
-    return d.content?.[0]?.text || "Error generating. Please try again.";
-  } catch(e) { return "Connection error. Please try again."; }
+function confetti(){
+  const cols=["#007AFF","#34D399","#F59E0B","#EC4899","#A78BFA","#FCD34D"];
+  for(let i=0;i<80;i++)setTimeout(()=>{
+    const d=document.createElement("div");
+    Object.assign(d.style,{position:"fixed",top:"-12px",left:`${Math.random()*100}vw`,
+      width:`${5+Math.random()*9}px`,height:`${5+Math.random()*9}px`,
+      background:cols[i%cols.length],borderRadius:Math.random()>.5?"50%":"2px",
+      zIndex:"9999",animation:`cfFall ${1.5+Math.random()*2}s ease-in forwards`,
+      animationDelay:`${Math.random()*.8}s`,transform:`rotate(${Math.random()*360}deg)`});
+    document.body.appendChild(d);setTimeout(()=>d.remove(),4000);
+  },i*25);
 }
 
-function el(tag, attrs, ...children) {
-  const e = document.createElement(tag);
-  if (attrs) {
-    Object.entries(attrs).forEach(([k,v]) => {
-      if (k === "class") e.className = v;
-      else if (k === "style" && typeof v === "object") Object.assign(e.style, v);
-      else if (k.startsWith("on")) e.addEventListener(k.slice(2).toLowerCase(), v);
-      else e.setAttribute(k, v);
-    });
+function render(){
+  const root=document.getElementById("R");
+  root.innerHTML="";
+  if(S.page==="home"){
+    root.appendChild(buildHome());
+    if(S.modal)root.appendChild(buildModal());
+    return;
   }
-  children.flat().forEach(c => {
-    if (c === null || c === undefined) return;
-    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
-  });
-  return e;
+  const wrap=el("div","");
+  Object.assign(wrap.style,{height:"100vh",display:"flex",overflow:"hidden"});
+  wrap.appendChild(buildSidebar());
+  const main=el("div","");
+  Object.assign(main.style,{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0});
+  main.appendChild(buildTopbar());
+  const content=el("div","");
+  Object.assign(content.style,{flex:1,overflow:"auto",padding:"26px 22px"});
+  const tabs={launch:buildLaunch,scripts:buildScripts,roadmap:buildRoadmap,notes:buildNotes,resources:buildResources};
+  content.appendChild((tabs[S.tab]||buildLaunch)());
+  main.appendChild(content);
+  wrap.appendChild(main);
+  root.appendChild(wrap);
+  if(S.modal)root.appendChild(buildModal());
+  if(S.drawer)root.appendChild(buildDrawer());
 }
 
-function html(str) {
-  const d = document.createElement("div");
-  d.innerHTML = str;
-  return d.firstChild || d;
-}
-
-function countDone(phaseKey) {
-  return (TASKS[phaseKey]||[]).filter(t => S.taskDone[t.k]).length;
-}
-
-function totalDone() {
-  return Object.values(TASKS).flat().filter(t => S.taskDone[t.k]).length;
-}
-
-function totalTasks() {
-  return Object.values(TASKS).flat().length;
-}
-
-function p1Done() { return countDone("p1"); }
-function p1Total() { return TASKS.p1.length; }
-function overallPct() { return totalTasks() > 0 ? Math.round((totalDone()/totalTasks())*100) : 0; }
-
-// ── MINI SVG PIE ──────────────────────────────────
-function makePie(pct, color, size=60) {
-  const r = size/2 - 6;
-  const cx = size/2, cy = size/2;
-  const angle = (pct/100) * 2 * Math.PI;
-  const x1 = cx + r * Math.sin(0);
-  const y1 = cy - r * Math.cos(0);
-  const x2 = cx + r * Math.sin(angle);
-  const y2 = cy - r * Math.cos(angle);
-  const large = angle > Math.PI ? 1 : 0;
-  const innerR = r - 10;
-
-  const pathD = pct >= 99
-    ? `M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.01} ${cy-r} Z M ${cx} ${cy-innerR} A ${innerR} ${innerR} 0 1 0 ${cx-0.01} ${cy-innerR} Z`
-    : pct <= 0
-    ? ""
-    : `M ${cx} ${cy-r} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${cx + innerR*Math.sin(angle)} ${cy - innerR*Math.cos(angle)} A ${innerR} ${innerR} 0 ${large} 0 ${cx} ${cy-innerR} Z`;
-
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
-    ${pct > 0 ? `<path d="${pathD}" fill="${color}" opacity="0.9"/>` : ''}
-    <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="-apple-system,sans-serif">${pct}%</text>
-  </svg>`;
-}
-
-// ── CONFETTI ──────────────────────────────────────
-function spawnConfetti() {
-  const colors = ["#007AFF","#34D399","#F59E0B","#EC4899","#A78BFA","#FCD34D"];
-  for (let i = 0; i < 80; i++) {
-    setTimeout(() => {
-      const d = document.createElement("div");
-      d.className = "cf-piece";
-      d.style.cssText = `
-        left:${Math.random()*100}vw;
-        width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;
-        background:${colors[Math.floor(Math.random()*colors.length)]};
-        border-radius:${Math.random()>.5?"50%":"2px"};
-        z-index:9999;
-        animation-duration:${1.5+Math.random()*2}s;
-        transform:rotate(${Math.random()*360}deg);
-      `;
-      document.body.appendChild(d);
-      setTimeout(() => d.remove(), 4000);
-    }, i * 30);
-  }
-}
-
-// ── COMPONENTS ────────────────────────────────────
-
-function renderSidebar() {
-  const tabs = [
-    {id:"launch",icon:"⚡",label:"Launch Pad"},
-    {id:"scripts",icon:"📡",label:"Script Vault"},
-    {id:"roadmap",icon:"🗺",label:"Roadmap"},
-    {id:"notes",icon:"📝",label:"Notes"},
-    {id:"resources",icon:"🔗",label:"Resources"},
-  ];
-
-  const sb = el("div", {class:"sidebar"});
-
-  // Logo
-  const logo = el("div", {style:{padding:"20px 16px 16px",borderBottom:"1px solid rgba(255,255,255,.07)"}});
-  logo.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:${S.idea?14:0}px">
-      <div style="width:30px;height:30px;background:linear-gradient(135deg,#007AFF,#0055FF);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px">⚡</div>
-      <div>
-        <div style="font-size:13px;font-weight:800;color:#F0F0F5">Execution OS</div>
-        <div style="font-size:9px;color:#4A4A5A">v2.0 PRO</div>
-      </div>
+function buildHome(){
+  const d=el("div","");
+  Object.assign(d.style,{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
+    background:"radial-gradient(ellipse at 50% 30%,rgba(0,122,255,.08) 0%,transparent 60%)"});
+  d.innerHTML=`<div style="text-align:center;max-width:540px;animation:fadeUp .6s ease;padding:20px">
+    <div style="font-size:56px;margin-bottom:16px">⚡</div>
+    <h1 style="font-size:38px;font-weight:900;margin-bottom:12px;letter-spacing:-1px">Execution OS</h1>
+    <p style="font-size:15px;color:#9191A4;line-height:1.7;margin-bottom:36px">Your AI-powered business launch system.<br>100 premium ideas · 7-hour framework · 30-day scaling plan.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:30px">
+      <button class="btn btn-p lg" id="hFind">✨ Find My Perfect Idea</button>
+      <button class="btn btn-g lg" id="hDemo">View Demo →</button>
     </div>
-    ${S.idea ? `<div style="background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.2);border-radius:8px;padding:7px 10px">
-      <div style="font-size:9px;color:#007AFF;font-weight:700;letter-spacing:1.5px;margin-bottom:2px">ACTIVE IDEA</div>
-      <div style="font-size:11px;color:#F0F0F5;font-weight:600;line-height:1.3">${S.idea.name}</div>
-    </div>` : ""}
-  `;
-  sb.appendChild(logo);
+    <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
+      ${["100 Premium Ideas","7-Hour Launch","30-Day Scaling","AI Scripts"].map(f=>`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4A4A5A"><div style="width:5px;height:5px;border-radius:50%;background:#007AFF"></div>${f}</div>`).join("")}
+    </div>
+  </div>`;
+  d.querySelector("#hFind").onclick=()=>{S.modal=true;render()};
+  d.querySelector("#hDemo").onclick=()=>{S.idea=IDEAS[0];S.page="dashboard";render()};
+  return d;
+}
 
-  // Nav
-  const nav = el("nav", {style:{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}});
-  tabs.forEach(t => {
-    const b = el("button", {
-      class: "nav-btn" + (S.tab===t.id?" active":""),
-      onClick: () => setState({tab:t.id})
-    });
-    b.innerHTML = `<span style="font-size:14px;width:17px;text-align:center">${t.icon}</span> ${t.label} ${S.tab===t.id?'<span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:#007AFF;display:inline-block"></span>':""}`;
+function buildSidebar(){
+  const sb=el("div","sidebar");
+  sb.innerHTML=`
+    <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${S.idea?14:0}px">
+        <div style="width:30px;height:30px;background:linear-gradient(135deg,#007AFF,#0055FF);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px">⚡</div>
+        <div><div style="font-size:13px;font-weight:800">Execution OS</div><div style="font-size:9px;color:#4A4A5A">v3.0 · $49</div></div>
+      </div>
+      ${S.idea?`<div style="background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.2);border-radius:8px;padding:8px 10px">
+        <div style="font-size:9px;color:#007AFF;font-weight:700;letter-spacing:1.5px;margin-bottom:2px">ACTIVE IDEA</div>
+        <div style="font-size:11px;font-weight:600;line-height:1.3">${S.idea.name}</div>
+      </div>`:""}
+    </div>
+    <nav style="flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px" id="sNav"></nav>
+    <div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,.07)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:11px;color:#4A4A5A">Progress</span>
+        <span style="font-size:11px;font-weight:700;color:#007AFF">${pct()}%</span>
+      </div>
+      <div class="pt"><div class="pf" style="width:${pct()}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div></div>
+      <div style="display:flex;align-items:center;gap:5px;margin-top:8px">
+        <div style="width:6px;height:6px;border-radius:50%;background:#34D399"></div>
+        <span style="font-size:9px;color:#4A4A5A">GAS Connected</span>
+      </div>
+    </div>`;
+  const TABS=[{id:"launch",icon:"⚡",label:"Launch Pad"},{id:"scripts",icon:"📡",label:"Script Vault"},
+    {id:"roadmap",icon:"🗺",label:"Roadmap"},{id:"notes",icon:"📝",label:"Notes"},{id:"resources",icon:"🔗",label:"Resources"}];
+  const nav=sb.querySelector("#sNav");
+  TABS.forEach(t=>{
+    const b=el("button",`nav-item${S.tab===t.id?" on":""}`);
+    b.innerHTML=`<span style="font-size:14px;width:17px;text-align:center">${t.icon}</span>${t.label}${S.tab===t.id?'<span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:#007AFF;display:inline-block"></span>':""}`;
+    b.onclick=()=>{S.tab=t.id;render()};
     nav.appendChild(b);
   });
-  sb.appendChild(nav);
-
-  // Progress
-  const prog = el("div", {style:{padding:"14px 16px",borderTop:"1px solid rgba(255,255,255,.07)"}});
-  prog.innerHTML = `
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:11px;color:#4A4A5A">Progress</span>
-      <span style="font-size:11px;font-weight:700;color:#007AFF">${overallPct()}%</span>
-    </div>
-    <div class="prog-wrap" style="margin-bottom:8px">
-      <div class="prog-bar" style="width:${overallPct()}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:5px">
-      <div style="width:6px;height:6px;border-radius:50%;background:#34D399"></div>
-      <span style="font-size:9px;color:#4A4A5A">GAS Connected</span>
-    </div>
-  `;
-  sb.appendChild(prog);
   return sb;
 }
 
-function renderTopbar() {
-  const tb = el("div", {class:"topbar"});
-  tb.innerHTML = `
+function buildTopbar(){
+  const tb=el("div","topbar");
+  tb.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:#4A4A5A">${S.idea ? S.idea.name : "No idea selected"}</span>
-      ${S.idea ? '<span class="badge" style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399">ACTIVE</span>' : ""}
+      <span style="font-size:13px;color:#4A4A5A">${S.idea?S.idea.name:"No idea selected"}</span>
+      ${S.idea?'<span style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px">ACTIVE</span>':""}
     </div>
     <div style="display:flex;align-items:center;gap:16px">
-      <div style="text-align:center">
-        <div style="font-size:17px;font-weight:800;color:#007AFF;line-height:1">${p1Done()}/${p1Total()}</div>
-        <div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">HOURS</div>
-      </div>
+      <div style="text-align:center"><div style="font-size:17px;font-weight:800;color:#007AFF;line-height:1">${p1d()}/${TASKS.p1.length}</div><div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">HOURS</div></div>
       <div style="width:1px;height:22px;background:rgba(255,255,255,.07)"></div>
-      <div style="text-align:center">
-        <div style="font-size:17px;font-weight:800;color:#34D399;line-height:1">${overallPct()}%</div>
-        <div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">DONE</div>
-      </div>
+      <div style="text-align:center"><div style="font-size:17px;font-weight:800;color:#34D399;line-height:1">${pct()}%</div><div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">DONE</div></div>
       <div style="width:1px;height:22px;background:rgba(255,255,255,.07)"></div>
-    </div>
-  `;
-  const btn = el("button", {class:"btn btn-primary btn-sm", onClick:()=>setState({modalOpen:true})});
-  btn.textContent = "✨ Find Idea";
-  tb.appendChild(btn);
+      <button class="btn btn-p sm" id="tbFind">✨ Find Idea</button>
+    </div>`;
+  tb.querySelector("#tbFind").onclick=()=>{S.modal=true;render()};
   return tb;
 }
 
-// ── LAUNCHPAD ──────────────────────────────────────
-function renderLaunch() {
-  const wrap = el("div", {style:{maxWidth:"820px",margin:"0 auto"}});
-  wrap.innerHTML = `
+function buildLaunch(){
+  const wrap=el("div","");
+  wrap.style.maxWidth="820px";wrap.style.margin="0 auto";
+  const icons=["🎯","🔍","💎","🚀","💳","🧲","📡"];
+  const p1pct=TASKS.p1.length?p1d()/TASKS.p1.length*100:0;
+  wrap.innerHTML=`
     <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">7-Hour Launch Pad</h1>
-    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">Every task has an AI-powered Tool-Kit. Click ⚡ to open it.</p>
-    <div class="glass" style="padding:12px 16px;margin-bottom:18px">
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">Every task has an AI Tool-Kit. Click ⚡ to open.</p>
+    <div class="glass" style="padding:12px 18px;margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;margin-bottom:7px">
         <span style="font-size:12px;color:#4A4A5A">Phase 1 Progress</span>
-        <span style="font-size:12px;font-weight:700;color:#007AFF">${p1Done()} / ${p1Total()} hours</span>
+        <span style="font-size:12px;font-weight:700;color:#007AFF">${p1d()} / ${TASKS.p1.length} hours</span>
       </div>
-      <div class="prog-wrap"><div class="prog-bar" style="width:${p1Total()>0?(p1Done()/p1Total()*100):0}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div></div>
+      <div class="pt"><div class="pf" style="width:${p1pct}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div></div>
     </div>
-  `;
+    <div id="tList" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="cta" style="margin-top:40px;text-align:center"></div>`;
 
-  const icons = ["🎯","🔍","💎","🚀","💳","🧲","📡"];
-  const list = el("div", {style:{display:"flex",flexDirection:"column",gap:10}});
-
-  TASKS.p1.forEach((task, i) => {
-    const isDone = !!S.taskDone[task.k];
-    const prevDone = i === 0 || !!S.taskDone[TASKS.p1[i-1]?.k];
-    const isActive = !isDone && prevDone;
-
-    const card = el("div", {
-      class: "glass task-card" + (isActive?" active-card":""),
-      style: {
-        border: isDone ? "1px solid rgba(52,211,153,.3)" : isActive ? "1px solid rgba(0,122,255,.35)" : "1px solid rgba(255,255,255,.07)"
-      }
-    });
-
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="check-circle" data-key="${task.k}" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;cursor:pointer;
-          background:${isDone?"rgba(52,211,153,.12)":"rgba(255,255,255,.04)"};
-          border:2px solid ${isDone?"#34D399":isActive?"#007AFF":"rgba(255,255,255,.1)"};
-          display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s">
-          ${isDone?"✓":icons[i]}
+  const list=wrap.querySelector("#tList");
+  TASKS.p1.forEach((t,i)=>{
+    const done=!!S.taskDone[t.k];
+    const prev=i===0||!!S.taskDone[TASKS.p1[i-1]?.k];
+    const active=!done&&prev;
+    const card=el("div","glass");
+    Object.assign(card.style,{padding:"16px 20px",border:`1px solid ${done?"rgba(52,211,153,.3)":active?"rgba(0,122,255,.35)":"rgba(255,255,255,.07)"}`,transition:"all .3s"});
+    card.innerHTML=`<div style="display:flex;align-items:center;gap:12px">
+      <div data-k="${t.k}" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;cursor:pointer;
+        background:${done?"rgba(52,211,153,.12)":"rgba(255,255,255,.04)"};
+        border:2px solid ${done?"#34D399":active?"#007AFF":"rgba(255,255,255,.1)"};
+        display:flex;align-items:center;justify-content:center;font-size:15px">${done?"✓":icons[i]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+          <span style="font-size:10px;color:${active?"#007AFF":"#4A4A5A"};font-weight:700;letter-spacing:1.5px">${t.slot.toUpperCase()}</span>
+          ${active?'<span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:1px 8px;border-radius:4px">NOW</span>':""}
+          ${done?'<span style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399;font-size:10px;font-weight:700;padding:1px 8px;border-radius:4px">DONE</span>':""}
         </div>
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-            <span style="font-size:10px;color:${isActive?"#007AFF":"#4A4A5A"};font-weight:700;letter-spacing:1.5px">${task.slot.toUpperCase()}</span>
-            ${isActive?'<span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF">NOW</span>':""}
-            ${isDone?'<span class="badge" style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399">DONE</span>':""}
-          </div>
-          <div style="font-size:14px;font-weight:700;color:${isDone?"#555":"#F0F0F5"};margin-bottom:2px">${task.task}</div>
-          <div style="font-size:12px;color:#4A4A5A">${task.action}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <div style="font-size:11px;color:#4A4A5A;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:4px 9px;white-space:nowrap">${task.tool}</div>
-          <button class="btn btn-sm toolkit-btn" data-idx="${i}" data-key="${task.k}" style="background:${isActive?"linear-gradient(135deg,#007AFF,#0055FF)":"rgba(255,255,255,.05)"};color:${isActive?"#fff":"#9191A4"};border:${isActive?"none":"1px solid rgba(255,255,255,.07)"}">⚡ Tool-Kit</button>
-        </div>
+        <div style="font-size:14px;font-weight:700;color:${done?"#555":"#F0F0F5"};margin-bottom:2px">${t.task}</div>
+        <div style="font-size:12px;color:#4A4A5A">${t.action}</div>
       </div>
-    `;
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span style="font-size:11px;color:#4A4A5A;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:4px 9px">${t.tool}</span>
+        <button data-i="${i}" class="btn sm" style="background:${active?"linear-gradient(135deg,#007AFF,#0055FF)":"rgba(255,255,255,.05)"};color:${active?"#fff":"#9191A4"};border:${active?"none":"1px solid rgba(255,255,255,.08)"}">⚡ Tool-Kit</button>
+      </div>
+    </div>`;
+    card.querySelector("[data-k]").onclick=()=>{S.taskDone[t.k]=!S.taskDone[t.k];gasPost({action:"updateProgress",taskKey:t.k,status:S.taskDone[t.k]?"complete":"pending"});render()};
+    card.querySelector("[data-i]").onclick=()=>{S.drawer={...t,idx:i};render()};
     list.appendChild(card);
   });
 
-  wrap.appendChild(list);
-
-  // Nuclear button
-  const nuc = el("div", {style:{marginTop:40,textAlign:"center"}});
-  if (!S.launched) {
-    nuc.innerHTML = `
-      <div style="font-size:12px;color:#4A4A5A;margin-bottom:14px">Complete all 7 hours to unlock the 30-day scaling plan</div>
-      <button id="nuclear-btn" class="btn btn-lg" style="background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;animation:nuclearPulse 2s ease-in-out infinite;letter-spacing:1.5px">☢ LAUNCH NOW</button>
-    `;
-  } else {
-    nuc.innerHTML = `
-      <div class="glass" style="padding:26px;border:1px solid rgba(52,211,153,.3);max-width:460px;margin:0 auto;background:rgba(52,211,153,.04)">
-        <div style="font-size:34px;margin-bottom:8px">🎉</div>
-        <div style="font-size:22px;font-weight:800;color:#34D399;margin-bottom:6px">YOU ARE LIVE!</div>
-        <div style="color:#4A4A5A;font-size:13px;margin-bottom:18px">30-Day Scaling Plan unlocked in Roadmap tab</div>
-        <button class="btn btn-success" id="go-roadmap">View 30-Day Plan →</button>
-      </div>
-    `;
+  const cta=wrap.querySelector("#cta");
+  if(!S.launched){
+    const nb=el("button","btn lg","☢ LAUNCH NOW");
+    Object.assign(nb.style,{background:"linear-gradient(135deg,#EF4444,#DC2626)",color:"#fff",animation:"nuclearPulse 2s ease-in-out infinite",letterSpacing:"1.5px"});
+    const hint=el("div","");hint.style.cssText="font-size:12px;color:#4A4A5A;margin-bottom:14px";hint.textContent="Complete all 7 hours → unlock 30-day scaling plan";
+    nb.onclick=()=>{confetti();S.launched=true;render()};
+    cta.appendChild(hint);cta.appendChild(nb);
+  }else{
+    cta.innerHTML=`<div class="glass" style="padding:26px;border:1px solid rgba(52,211,153,.3);max-width:460px;margin:0 auto;background:rgba(52,211,153,.04)">
+      <div style="font-size:34px;margin-bottom:8px">🎉</div>
+      <div style="font-size:22px;font-weight:800;color:#34D399;margin-bottom:6px">YOU ARE LIVE!</div>
+      <div style="color:#4A4A5A;font-size:13px;margin-bottom:18px">30-Day Scaling Plan unlocked in Roadmap tab</div>
+      <button class="btn btn-s" id="goRM">View 30-Day Plan →</button>
+    </div>`;
+    cta.querySelector("#goRM").onclick=()=>{S.tab="roadmap";render()};
   }
-  wrap.appendChild(nuc);
   return wrap;
 }
 
-// ── SCRIPTS TAB ───────────────────────────────────
-function renderScripts() {
-  const wrap = el("div", {style:{maxWidth:"900px",margin:"0 auto"}});
-
-  if (!S.idea) {
-    wrap.innerHTML = `
-      <h1 style="font-size:24px;font-weight:800;margin-bottom:20px">Script Vault</h1>
-      <div class="glass" style="padding:60px;text-align:center">
-        <div style="font-size:44px;margin-bottom:14px">💡</div>
-        <div style="color:#4A4A5A">Select an idea first to generate personalized scripts</div>
-      </div>
-    `;
+function buildScripts(){
+  const wrap=el("div","");wrap.style.cssText="max-width:900px;margin:0 auto";
+  if(!S.idea){
+    wrap.innerHTML=`<h1 style="font-size:24px;font-weight:800;margin-bottom:20px">Script Vault</h1>
+      <div class="glass" style="padding:60px;text-align:center"><div style="font-size:44px;margin-bottom:14px">💡</div><div style="color:#4A4A5A">Select an idea first to unlock personalized scripts</div></div>`;
     return wrap;
   }
-
-  wrap.innerHTML = `
+  wrap.innerHTML=`
     <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Script Vault</h1>
-    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">AI scripts for <strong style="color:#007AFF">${S.idea.name}</strong> — click, copy, paste, post.</p>
-  `;
-
-  // Channel buttons
-  const btns = el("div", {style:{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}});
-  const SCRIPT_TYPES = [
-    {id:"reddit",label:"Reddit Post",icon:"🔴",color:"#FF4500"},
-    {id:"twitter",label:"Twitter Thread",icon:"𝕏",color:"#1D9BF0"},
-    {id:"cold_dm",label:"Cold DM",icon:"💬",color:"#007AFF"},
-    {id:"linkedin",label:"LinkedIn",icon:"in",color:"#0A66C2"},
-    {id:"email",label:"Launch Email",icon:"✉",color:"#34D399"},
-  ];
-  SCRIPT_TYPES.forEach(st => {
-    const active = S.scriptActive === st.id;
-    const b = el("button", {
-      class:"btn btn-sm script-type-btn",
-      "data-type": st.id,
-      style: {
-        background: active ? `${st.color}18` : "rgba(255,255,255,.03)",
-        border: `1px solid ${active ? st.color : "rgba(255,255,255,.07)"}`,
-        color: active ? st.color : "#9191A4",
-        display:"flex",alignItems:"center",gap:7,
-      }
-    });
-    b.innerHTML = `${st.icon} ${st.label} ${S.scriptLoading[st.id]?'<span style="width:11px;height:11px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>':""}`;
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">AI scripts for <strong style="color:#007AFF">${S.idea.name}</strong> — click, copy, post.</p>
+    <div id="chBtns" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div class="glass" style="padding:16px">
+        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px;display:inline-block;margin-bottom:8px">IDEA SCRIPTS</span>
+        <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;white-space:pre-wrap;max-height:140px;overflow:auto;margin-bottom:10px">${S.idea.scripts}</pre>
+        <button class="btn btn-g sm" id="cpScr">📋 Copy</button>
+      </div>
+      <div class="glass" style="padding:16px">
+        <span style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#F59E0B;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px;display:inline-block;margin-bottom:8px">SCALING PLAN</span>
+        <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;white-space:pre-wrap;max-height:140px;overflow:auto;margin-bottom:10px">${S.idea.scale}</pre>
+        <button class="btn btn-g sm" id="cpScale">📋 Copy</button>
+      </div>
+    </div>
+    <div id="aiOut"></div>`;
+  wrap.querySelector("#cpScr").onclick=()=>navigator.clipboard.writeText(S.idea.scripts);
+  wrap.querySelector("#cpScale").onclick=()=>navigator.clipboard.writeText(S.idea.scale);
+  const btns=wrap.querySelector("#chBtns");
+  CHANNELS.forEach(ch=>{
+    const active=S.scriptActive===ch.id;
+    const b=el("button","btn sm");
+    Object.assign(b.style,{background:active?`${ch.color}18`:"rgba(255,255,255,.03)",border:`1px solid ${active?ch.color:"rgba(255,255,255,.08)"}`,color:active?ch.color:"#9191A4",display:"flex",alignItems:"center",gap:"7px"});
+    b.innerHTML=`${ch.icon} ${ch.label}${S.scriptLoading[ch.id]?'<span style="width:11px;height:11px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;opacity:.6"></span>':""}`;
+    b.onclick=()=>genScript(ch,wrap.querySelector("#aiOut"));
     btns.appendChild(b);
   });
-  wrap.appendChild(btns);
-
-  // Static scripts from idea data
-  const staticGrid = el("div", {class:"grid2", style:{marginBottom:20}});
-  staticGrid.innerHTML = `
-    <div class="glass" style="padding:16px">
-      <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:8px">MASTER_DB SCRIPTS</span>
-      <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;max-height:160px;overflow:auto;margin:0 0 10px">${S.idea.scripts}</pre>
-      <button class="btn btn-ghost btn-sm copy-static-scripts">📋 Copy</button>
-    </div>
-    <div class="glass" style="padding:16px">
-      <span class="badge" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#F59E0B;margin-bottom:8px">SCALING ROADMAP</span>
-      <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;max-height:160px;overflow:auto;margin:0 0 10px">${S.idea.scale}</pre>
-      <button class="btn btn-ghost btn-sm copy-static-scale">📋 Copy</button>
-    </div>
-  `;
-  wrap.appendChild(staticGrid);
-
-  // AI output area
-  if (S.scriptActive) {
-    const outBox = el("div", {class:"glass", style:{padding:18}});
-    const isLoading = S.scriptLoading[S.scriptActive];
-    const output = S.scriptOuts[S.scriptActive];
-    outBox.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF">AI GENERATED — ${S.scriptActive.toUpperCase().replace("_"," ")}</span>
-        <div style="display:flex;gap:8px">
-          ${output?`<button class="btn btn-ghost btn-sm copy-ai-output" data-text="${encodeURIComponent(output)}">📋 Copy All</button><button class="btn btn-ghost btn-sm regen-script" data-type="${S.scriptActive}">🔄</button>`:""}
-        </div>
-      </div>
-      ${isLoading ? `<div style="text-align:center;padding:30px">
-        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 12px"></div>
-        <div style="color:#007AFF;font-size:12px">Writing your script...</div>
-      </div>` : output ? `<pre style="font-size:13px;line-height:1.75;color:#C8C8D0;max-height:320px;overflow:auto">${output}</pre>` : ""}
-    `;
-    wrap.appendChild(outBox);
-  }
-
+  if(S.scriptActive)showScriptOut(wrap.querySelector("#aiOut"));
   return wrap;
 }
 
-// ── ROADMAP TAB ───────────────────────────────────
-function renderRoadmap() {
-  const wrap = el("div", {style:{maxWidth:"1100px",margin:"0 auto"}});
+async function genScript(ch,outEl){
+  if(!S.idea)return;
+  S.scriptActive=ch.id;
+  if(S.scriptOuts[ch.id]){render();return;}
+  S.scriptLoading[ch.id]=true;render();
+  const P={
+    reddit:`Reddit post for: "${S.idea.name}". USP: ${S.idea.usp}. Story-first, product at end. Title + 300-word body in Reddit markdown.`,
+    twitter:`8-tweet viral thread for: "${S.idea.name}". Tweet 1 is scroll-stopping. Number "1/" style.`,
+    cold_dm:`3 cold DMs for: "${S.idea.name}". Short (50w), Medium (100w), Story (200w). Human, not salesy.`,
+    linkedin:`LinkedIn launch post for: "${S.idea.name}". Hook → problem → solution → CTA in comments.`,
+    email:`Launch email for: "${S.idea.name}". Subject (2 options), preview, full body with hook/story/offer/CTA, PS line.`,
+  };
+  S.scriptOuts[ch.id]=await callAI(P[ch.id],"You are an elite direct-response copywriter. Be specific and conversion-focused.");
+  S.scriptLoading[ch.id]=false;render();
+}
 
-  // Header + pies
-  const hdr = el("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:22,flexWrap:"wrap",gap:14}});
-  hdr.innerHTML = `
-    <div>
-      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">30-Day Execution Roadmap</h1>
-      <p style="color:#4A4A5A;font-size:13px">Tick tasks to track progress. Bottleneck alerts fire automatically.</p>
-    </div>
-    <div style="display:flex;gap:12px">
-      <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">
-        ${makePie(p1Total()>0?Math.round(p1Done()/p1Total()*100):0,"#007AFF",62)}
-        <div>
-          <div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">TODAY'S GOAL</div>
-          <div style="font-size:11px;color:#9191A4">${p1Done()}/${p1Total()} hrs</div>
+function showScriptOut(outEl){
+  if(!outEl)return;
+  const ch=CHANNELS.find(c=>c.id===S.scriptActive);
+  outEl.className="glass";outEl.style.padding="18px";
+  if(S.scriptLoading[S.scriptActive]){
+    outEl.innerHTML=`<div style="text-align:center;padding:30px"><div style="width:32px;height:32px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div><div style="color:#007AFF;font-size:12px">Writing ${ch?.label}...</div></div>`;
+  }else if(S.scriptOuts[S.scriptActive]){
+    outEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px">AI — ${S.scriptActive.toUpperCase().replace("_"," ")}</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-g sm" id="cpAI">📋 Copy All</button>
+          <button class="btn btn-g sm" id="rgAI">🔄</button>
         </div>
       </div>
-      <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">
-        ${makePie(overallPct(),"#34D399",62)}
-        <div>
-          <div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">30-DAY SCALE</div>
-          <div style="font-size:11px;color:#9191A4">${totalDone()}/${totalTasks()}</div>
-        </div>
+      <pre style="font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${S.scriptOuts[S.scriptActive]}</pre>`;
+    outEl.querySelector("#cpAI").onclick=()=>navigator.clipboard.writeText(S.scriptOuts[S.scriptActive]);
+    outEl.querySelector("#rgAI").onclick=()=>{S.scriptOuts[S.scriptActive]=null;genScript(CHANNELS.find(c=>c.id===S.scriptActive),outEl)};
+  }
+}
+
+function buildRoadmap(){
+  const wrap=el("div","");wrap.style.cssText="max-width:1100px;margin:0 auto";
+  const p1pct=TASKS.p1.length?Math.round(p1d()/TASKS.p1.length*100):0;
+  wrap.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap;gap:14px">
+      <div><h1 style="font-size:24px;font-weight:800;margin-bottom:6px">30-Day Roadmap</h1><p style="color:#4A4A5A;font-size:13px">Tick tasks as you complete them.</p></div>
+      <div style="display:flex;gap:12px">
+        <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">${pie(p1pct,"#007AFF",62)}<div><div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">TODAY'S GOAL</div><div style="font-size:11px;color:#9191A4">${p1d()}/${TASKS.p1.length} hrs</div></div></div>
+        <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">${pie(pct(),"#34D399",62)}<div><div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">30-DAY SCALE</div><div style="font-size:11px;color:#9191A4">${totalDone()}/${totalTasks()}</div></div></div>
       </div>
     </div>
-  `;
-  wrap.appendChild(hdr);
-
-  // Overall bar
-  const ob = el("div", {class:"glass", style:{padding:"12px 18px",marginBottom:18}});
-  ob.innerHTML = `
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:12px;color:#4A4A5A">Overall Progress</span>
-      <span style="font-size:12px;font-weight:700;color:#007AFF">${totalDone()} / ${totalTasks()} tasks</span>
+    <div class="glass" style="padding:12px 18px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:#4A4A5A">Overall Progress</span><span style="font-size:12px;font-weight:700;color:#007AFF">${totalDone()} / ${totalTasks()} tasks</span></div>
+      <div class="pt"><div class="pf" style="width:${pct()}%;background:linear-gradient(90deg,#007AFF,#34D399,#F59E0B)"></div></div>
     </div>
-    <div class="prog-wrap">
-      <div class="prog-bar" style="width:${overallPct()}%;background:linear-gradient(90deg,#007AFF,#34D399,#F59E0B)"></div>
-    </div>
-  `;
-  wrap.appendChild(ob);
-
-  // Phase cards
-  const grid = el("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:14}});
-
-  PHASE_META.forEach(ph => {
-    const phaseTasks = TASKS[ph.key] || [];
-    const done = countDone(ph.key);
-    const pct = phaseTasks.length ? Math.round((done/phaseTasks.length)*100) : 0;
-
-    const card = el("div", {class:"glass", style:{padding:18,position:"relative",overflow:"hidden"}});
-    card.innerHTML = `
+    <div id="phGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px"></div>`;
+  const grid=wrap.querySelector("#phGrid");
+  PH.forEach(ph=>{
+    const tasks=TASKS[ph.key]||[];
+    const done=tasks.filter(t=>S.taskDone[t.k]).length;
+    const p=tasks.length?Math.round(done/tasks.length*100):0;
+    const card=el("div","glass");card.style.padding="18px";
+    card.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
         <div>
-          <span class="badge" style="background:${ph.color}18;border:1px solid ${ph.color}40;color:${ph.color};margin-bottom:5px">${ph.short}</span>
+          <span style="background:${ph.color}18;border:1px solid ${ph.color}40;color:${ph.color};font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px;display:inline-block;margin-bottom:5px">${ph.short}</span>
           <div style="font-size:14px;font-weight:700">${ph.label}</div>
         </div>
-        <div style="font-size:20px;font-weight:800;color:${ph.color}">${pct}%</div>
+        <div style="font-size:20px;font-weight:800;color:${ph.color}">${p}%</div>
       </div>
-      <div class="prog-wrap" style="margin-bottom:10px">
-        <div class="prog-bar" style="width:${pct}%;background:${ph.color}"></div>
+      <div class="pt" style="margin-bottom:10px"><div class="pf" style="width:${p}%;background:${ph.color}"></div></div>
+      <div id="tks_${ph.key}" style="display:flex;flex-direction:column;gap:7px"></div>`;
+    const tksEl=card.querySelector(`#tks_${ph.key}`);
+    tasks.forEach(t=>{
+      const isDone=!!S.taskDone[t.k];
+      const row=el("div","");row.style.cssText="display:flex;align-items:flex-start;gap:8px;cursor:pointer";
+      row.innerHTML=`<div style="width:15px;height:15px;border-radius:4px;flex-shrink:0;margin-top:1px;
+        background:${isDone?ph.color:"rgba(255,255,255,.05)"};
+        border:1px solid ${isDone?ph.color:"rgba(255,255,255,.1)"};
+        display:flex;align-items:center;justify-content:center;transition:all .2s">
+        ${isDone?'<span style="font-size:9px;color:#000;font-weight:900">✓</span>':""}
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${phaseTasks.map(t => {
-          const isDone = !!S.taskDone[t.k];
-          return `<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
-            <input type="checkbox" class="task-check" data-key="${t.k}" ${isDone?"checked":""} style="display:none">
-            <div style="width:14px;height:14px;border-radius:3px;flex-shrink:0;margin-top:2px;
-              background:${isDone?ph.color:"rgba(255,255,255,.05)"};
-              border:1px solid ${isDone?ph.color:"rgba(255,255,255,.1)"};
-              display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s">
-              ${isDone?'<span style="font-size:8px;color:#000;font-weight:900">✓</span>':""}
-            </div>
-            <div>
-              <div style="font-size:11px;font-weight:600;color:${isDone?"#555":"#F0F0F5"};text-decoration:${isDone?"line-through":"none"};line-height:1.3">${t.task}</div>
-              <div style="font-size:10px;color:#4A4A5A;margin-top:1px">${t.tool}</div>
-            </div>
-          </label>`;
-        }).join("")}
-      </div>
-    `;
+      <div>
+        <div style="font-size:11px;font-weight:600;color:${isDone?"#555":"#F0F0F5"};text-decoration:${isDone?"line-through":"none"};line-height:1.3">${t.task}</div>
+        <div style="font-size:10px;color:#4A4A5A;margin-top:1px">${t.tool}</div>
+      </div>`;
+      row.onclick=()=>{S.taskDone[t.k]=!S.taskDone[t.k];gasPost({action:"updateProgress",taskKey:t.k,status:S.taskDone[t.k]?"complete":"pending"});render()};
+      tksEl.appendChild(row);
+    });
     grid.appendChild(card);
   });
-
-  wrap.appendChild(grid);
   return wrap;
 }
 
-// ── NOTES TAB ─────────────────────────────────────
-function renderNotes() {
-  const wrap = el("div", {style:{maxWidth:"860px",margin:"0 auto"}});
-  wrap.innerHTML = `
+function buildNotes(){
+  const wrap=el("div","");wrap.style.cssText="max-width:860px;margin:0 auto";
+  wrap.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div>
-        <h1 style="font-size:24px;font-weight:800;margin-bottom:4px">Scratchpad</h1>
-        <p style="color:#4A4A5A;font-size:13px">Markdown notes · <span style="color:${S.notesSaved?"#34D399":"#F59E0B"}">${S.notesSaved?"✓ Auto-saved":"⟳ Saving..."}</span></p>
+      <div><h1 style="font-size:24px;font-weight:800;margin-bottom:4px">Scratchpad</h1>
+        <p style="color:#4A4A5A;font-size:13px">Auto-saves every 60s to Google Sheet · <span id="saveSt" style="color:${S.notesSaved?"#34D399":"#F59E0B"}">${S.notesSaved?"✓ Saved":"⟳ Saving..."}</span></p>
       </div>
-      <button class="btn btn-ghost btn-sm" id="copy-notes">📋 Copy All</button>
+      <button class="btn btn-g sm" id="cpNotes">📋 Copy All</button>
     </div>
     <div class="glass" style="padding:4px">
-      <textarea id="notes-area" style="min-height:540px;width:100%;box-sizing:border-box">${S.notes}</textarea>
+      <textarea id="notesTA" style="width:100%;min-height:540px;background:transparent;border:none;outline:none;color:#C8C8D0;font-size:14px;line-height:1.75;padding:18px;font-family:'SF Mono','Fira Code',monospace;resize:none;box-sizing:border-box">${S.notes}</textarea>
     </div>
     <div style="display:flex;justify-content:space-between;margin-top:7px">
-      <span style="font-size:11px;color:#4A4A5A">${S.notes.split("\n").length} lines · ${S.notes.length} chars</span>
-      <span style="font-size:11px;color:#4A4A5A">Auto-saves every 60s to Google Sheet</span>
-    </div>
-  `;
+      <span style="font-size:11px;color:#4A4A5A">${S.notes.split("\n").length} lines</span>
+      <span style="font-size:11px;color:#4A4A5A">Saves to Sheet: User_Notes tab</span>
+    </div>`;
+  wrap.querySelector("#cpNotes").onclick=()=>navigator.clipboard.writeText(S.notes);
+  wrap.querySelector("#notesTA").oninput=e=>{
+    S.notes=e.target.value;S.notesSaved=false;
+    clearTimeout(notesTimer);
+    notesTimer=setTimeout(async()=>{
+      await gasPost({action:"saveNotes",notes:S.notes});S.notesSaved=true;
+      const ss=document.getElementById("saveSt");
+      if(ss){ss.textContent="✓ Saved";ss.style.color="#34D399";}
+    },60000);
+  };
   return wrap;
 }
 
-// ── RESOURCES TAB ─────────────────────────────────
-function renderResources() {
-  const wrap = el("div", {style:{maxWidth:"960px",margin:"0 auto"}});
-  wrap.innerHTML = `<h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Resource Vault</h1>
-    <p style="color:#4A4A5A;font-size:13px;margin-bottom:22px">Every tool you need — no Googling required.</p>`;
-  const grid = el("div", {class:"grid-res"});
-  RESOURCES.forEach(r => {
-    grid.innerHTML += `
-      <a href="${r.u}" target="_blank" class="glass" style="padding:16px;display:block;cursor:pointer;transition:all .2s"
+function buildResources(){
+  const wrap=el("div","");wrap.style.cssText="max-width:960px;margin:0 auto";
+  wrap.innerHTML=`<h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Resource Vault</h1>
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:22px">Every tool you need — zero Googling.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">
+      ${RES.map(r=>`<a href="${r.u}" target="_blank" class="glass" style="padding:16px;display:block;transition:all .2s"
         onmouseover="this.style.background='rgba(0,122,255,.06)';this.style.borderColor='rgba(0,122,255,.3)'"
         onmouseout="this.style.background='rgba(255,255,255,.025)';this.style.borderColor='rgba(255,255,255,.07)'">
         <div style="font-size:24px;margin-bottom:6px">${r.i}</div>
         <div style="font-size:12px;font-weight:700;margin-bottom:2px">${r.n}</div>
         <div style="font-size:10px;color:#4A4A5A;margin-bottom:8px">${r.d}</div>
         <div style="font-size:10px;color:#007AFF;font-weight:700">Open →</div>
-      </a>`;
-  });
-  wrap.appendChild(grid);
+      </a>`).join("")}
+    </div>`;
   return wrap;
 }
 
-// ── ACTION DRAWER ─────────────────────────────────
-function renderDrawer() {
-  if (!S.drawerTask) return null;
-  const task = S.drawerTask;
-  const idea = S.idea;
-
-  const ov = el("div", {class:"overlay", id:"drawer-overlay"});
-  const box = el("div", {style:{background:"#0F0F13",border:"1px solid rgba(0,122,255,.35)",borderRadius:20,width:"100%",maxWidth:660,maxHeight:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 0 60px rgba(0,122,255,.2)"}});
-
-  box.innerHTML = `
+function buildDrawer(){
+  const t=S.drawer,idea=S.idea;
+  const ov=el("div","overlay");
+  ov.onclick=e=>{if(e.target===ov){S.drawer=null;render()}};
+  const box=el("div","");
+  Object.assign(box.style,{background:"#0F0F13",border:"1px solid rgba(0,122,255,.35)",borderRadius:"20px",
+    width:"100%",maxWidth:"660px",maxHeight:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",
+    boxShadow:"0 0 60px rgba(0,122,255,.2)"});
+  box.innerHTML=`
     <div style="padding:22px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:6px">ACTION DRAWER — ${task.slot.toUpperCase()}</span>
-        <div style="font-size:20px;font-weight:800">${task.task} Tool-Kit</div>
-        <div style="font-size:12px;color:#4A4A5A;margin-top:3px">${task.action}</div>
+        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px;display:inline-block;margin-bottom:6px">TOOL-KIT — ${t.slot.toUpperCase()}</span>
+        <div style="font-size:20px;font-weight:800">${t.task}</div>
+        <div style="font-size:12px;color:#4A4A5A;margin-top:3px">${t.action}</div>
       </div>
-      <button id="close-drawer" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px">✕</button>
+      <button id="closeD" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px">✕</button>
     </div>
-    <div style="flex:1;overflow:auto;padding:22px 26px" id="drawer-body">
+    <div id="dBody" style="flex:1;overflow:auto;padding:22px 26px">
       <div style="background:rgba(0,122,255,.05);border:1px dashed rgba(0,122,255,.2);border-radius:12px;padding:40px;text-align:center">
-        <div style="font-size:40px;margin-bottom:12px">${["🎯","🔍","💎","🚀","💳","🧲","📡"][task.idx]||"⚡"}</div>
-        <div style="color:#4A4A5A;margin-bottom:20px;font-size:13px">AI generates a custom plan for <strong style="color:#007AFF">${idea?.name||"your idea"}</strong></div>
-        <button class="btn btn-primary" id="gen-drawer-btn">⚡ Generate Action Plan</button>
+        <div style="font-size:40px;margin-bottom:12px">${["🎯","🔍","💎","🚀","💳","🧲","📡"][t.idx]||"⚡"}</div>
+        <div style="color:#4A4A5A;margin-bottom:20px;font-size:13px">AI builds a custom plan for <strong style="color:#007AFF">${idea?.name||"your idea"}</strong></div>
+        <button class="btn btn-p" id="genBtn">⚡ Generate Action Plan</button>
       </div>
-    </div>
-  `;
-
-  ov.appendChild(box);
-  ov.addEventListener("click", e => { if(e.target===ov) setState({drawerTask:null}); });
-  return ov;
-}
-
-// ── IDEA MODAL ────────────────────────────────────
-function renderModal() {
-  if (!S.modalOpen) return null;
-  const ov = el("div", {class:"overlay", id:"modal-overlay"});
-  const box = el("div", {class:"modal"});
-
-  box.innerHTML = `
-    <div style="padding:24px 30px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:flex-start">
-      <div>
-        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:8px">IDEA ENGINE — 100 PREMIUM AI BUSINESSES</span>
-        <div style="font-size:22px;font-weight:800">Find Your Perfect Business</div>
-      </div>
-      <button id="close-modal" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="flex:1;overflow:auto;padding:26px 30px" id="modal-body">
-      ${renderModalBody()}
-    </div>
-  `;
-
-  ov.appendChild(box);
-  ov.addEventListener("click", e => { if(e.target===ov) setState({modalOpen:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false}); });
-  return ov;
-}
-
-function renderModalBody() {
-  const step = S.qaStep;
-  const isResults = step >= QUESTIONS.length && S.qaIdeas.length > 0;
-  const isLoading = S.qaLoading;
-
-  if (isLoading) return `
-    <div style="text-align:center;padding:70px 0">
-      <div class="spinner" style="width:52px;height:52px;border:4px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 18px"></div>
-      <div style="font-size:20px;font-weight:700;margin-bottom:8px">Analyzing Your Profile...</div>
-      <div style="color:#4A4A5A;font-size:13px">Scanning 100 premium ideas · Calculating confidence scores</div>
-    </div>
-  `;
-
-  if (isResults) {
-    const cards = S.qaIdeas.map((idea,i) => {
-      const diff = parseInt(idea.diff)||3;
-      const diffC = {1:"#34D399",2:"#34D399",3:"#F59E0B",4:"#EF4444",5:"#EF4444"}[diff];
-      return `
-        <div class="idea-select-card" data-idx="${i}" style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s"
-          onmouseover="this.style.borderColor='rgba(0,122,255,.35)';this.style.background='rgba(0,122,255,.05)'"
-          onmouseout="this.style.borderColor='rgba(255,255,255,.07)';this.style.background='rgba(255,255,255,.025)'">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-            <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:9px">${(idea.cat||"AI").split(" ")[0]}</span>
-            <span style="font-size:14px;font-weight:800;color:#34D399">${idea.conf}%</span>
-          </div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:5px;line-height:1.3">${idea.name}</div>
-          <div style="font-size:11px;color:#4A4A5A;margin-bottom:12px;line-height:1.5">${idea.usp}</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
-            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Revenue</span><span style="font-size:10px;color:#34D399;font-weight:700">$1K–$10K/mo</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#4A4A5A">Difficulty</span><div style="display:flex;gap:2px">${[1,2,3,4,5].map(d=>`<div style="width:7px;height:7px;border-radius:2px;background:${d<=diff?diffC:"rgba(255,255,255,.1)"}"></div>`).join("")}</div></div>
-            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Launch Speed</span><span style="font-size:10px;color:#F59E0B;font-weight:700">7 hours</span></div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="pickIdea(${i})" style="width:100%">🚀 Start Execution</button>
-        </div>
-      `;
-    }).join("");
-    return `
-      <div style="font-size:12px;color:#34D399;font-weight:700;margin-bottom:18px">✨ ${S.qaIdeas.length} ideas matched — ranked by confidence</div>
-      <div class="grid-auto">${cards}</div>
-    `;
-  }
-
-  // Question view — option buttons
-  const q = QUESTIONS[step] || QUESTIONS[0];
-  const bars = QUESTIONS.map((_,i) => `<div style="flex:1;height:3px;border-radius:2px;background:${i<=step?"#007AFF":"rgba(255,255,255,.07)"}"></div>`).join("");
-  const selected = S.qaAnswers[step] || "";
-  const optButtons = (q.opts||[]).map(opt => {
-    const isSel = selected === opt;
-    const sv = opt.replace(/'/g, "\\'");
-    return `<button class="qa-opt-btn" data-val="${opt}" onclick="selectQAOption('${sv}')"
-      style="padding:13px 16px;border-radius:10px;width:100%;
-      border:2px solid ${isSel?"#007AFF":"rgba(255,255,255,.1)"};
-      background:${isSel?"rgba(0,122,255,.12)":"rgba(255,255,255,.03)"};
-      color:${isSel?"#007AFF":"#C8C8D0"};font-size:13px;font-weight:${isSel?"700":"500"};
-      cursor:pointer;text-align:left;transition:all .15s;font-family:inherit;
-      display:flex;align-items:center;gap:10px">
-      <span class="opt-dot" style="width:16px;height:16px;border-radius:50%;flex-shrink:0;
-        border:2px solid ${isSel?"#007AFF":"rgba(255,255,255,.25)"};
-        background:${isSel?"#007AFF":"transparent"};
-        display:flex;align-items:center;justify-content:center">
-        <span style="width:6px;height:6px;border-radius:50%;background:#fff;display:${isSel?"block":"none"}"></span>
-      </span>
-      ${opt}
-    </button>`;
-  }).join("");
-  return `
-    <div style="animation:fadeUp .3s ease">
-      <div style="display:flex;gap:6px;margin-bottom:26px">${bars}</div>
-      <div style="font-size:12px;color:#007AFF;font-weight:700;margin-bottom:8px">QUESTION ${step+1} OF ${QUESTIONS.length}</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <span style="font-size:26px">${q.icon||"💡"}</span>
-        <div style="font-size:19px;font-weight:700">${q.q}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
-        ${optButtons}
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <button class="btn btn-ghost" onclick="if(S.qaStep>0){S.qaStep--;var b=document.getElementById('modal-body');if(b){b.innerHTML=renderModalBody();bindModalAfterRender();}}" ${step===0?"disabled":""}>← Back</button>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${!selected?'<span style="font-size:12px;color:#4A4A5A">👆 Pick one</span>':""}
-          <button id="qa-next-btn" class="btn btn-primary" onclick="handleQANext()" ${!selected?"disabled":""} style="opacity:${selected?"1":"0.45"}">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── HOME SCREEN ───────────────────────────────────
-function renderHome() {
-  const wrap = el("div", {id:"app", style:{height:"100vh",display:"flex",flexDirection:"column",background:"#0A0A0B"}});
-  const onboard = el("div", {class:"onboard"});
-  onboard.innerHTML = `
-    <div style="text-align:center;max-width:540px;animation:fadeUp .6s ease">
-      <div style="font-size:54px;margin-bottom:14px">⚡</div>
-      <h1 style="font-size:36px;font-weight:900;margin-bottom:12px;letter-spacing:-1px">Execution OS</h1>
-      <p style="font-size:15px;color:#9191A4;line-height:1.7;margin-bottom:34px">Your AI-powered business launch system.<br>100 premium ideas · 7-hour framework · 30-day scaling plan.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:28px">
-        <button class="btn btn-primary btn-lg" id="home-find-idea">✨ Find My Perfect Idea</button>
-        <button class="btn btn-ghost btn-lg" id="home-demo">View Demo →</button>
-      </div>
-      <div style="display:flex;gap:22px;justify-content:center;flex-wrap:wrap">
-        ${["100 Premium Ideas","7-Hour Launch","30-Day Scaling","AI Scripts"].map(f=>`
-          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4A4A5A">
-            <div style="width:5px;height:5px;border-radius:50%;background:#007AFF"></div>${f}
-          </div>`).join("")}
-      </div>
-    </div>
-  `;
-  wrap.appendChild(onboard);
-  return wrap;
-}
-
-// ── MAIN RENDER ───────────────────────────────────
-function render() {
-  const app = document.getElementById("app");
-  if (!app) return;
-
-  // Home page
-  if (S.page === "home") {
-    const newApp = renderHome();
-    newApp.id = "app";
-    app.replaceWith(newApp);
-    bindHomeEvents();
-
-    // Modal
-    const modal = renderModal();
-    if (modal) {
-      document.body.appendChild(modal);
-      bindModalEvents();
-    }
-    return;
-  }
-
-  // Dashboard
-  const newApp = el("div", {id:"app"});
-  const dash = el("div", {class:"dashboard"});
-  dash.appendChild(renderSidebar());
-
-  const main = el("div", {class:"main"});
-  main.appendChild(renderTopbar());
-
-  const content = el("div", {class:"content"});
-  const TAB_FN = {launch:renderLaunch, scripts:renderScripts, roadmap:renderRoadmap, notes:renderNotes, resources:renderResources};
-  content.appendChild((TAB_FN[S.tab]||renderLaunch)());
-  main.appendChild(content);
-  dash.appendChild(main);
-  newApp.appendChild(dash);
-
-  // Modals/drawers
-  const drawer = renderDrawer();
-  if (drawer) newApp.appendChild(drawer);
-  const modal = renderModal();
-  if (modal) newApp.appendChild(modal);
-
-  app.replaceWith(newApp);
-  bindDashEvents();
-}
-
-// ── EVENT BINDING ─────────────────────────────────
-function bindDashEvents() {
-  // Nav tabs
-  document.querySelectorAll(".nav-btn").forEach(b => {
-    b.addEventListener("click", () => setState({tab: b.textContent.trim().includes("Launch")?"launch":b.textContent.trim().includes("Script")?"scripts":b.textContent.trim().includes("Roadmap")?"roadmap":b.textContent.trim().includes("Notes")?"notes":"resources"}));
-  });
-
-  // Find idea button in topbar
-  document.querySelectorAll("button").forEach(b => {
-    if (b.textContent.includes("Find Idea")) b.addEventListener("click", () => setState({modalOpen:true}));
-  });
-
-  // Task circle toggle (launchpad)
-  document.querySelectorAll(".check-circle").forEach(c => {
-    c.addEventListener("click", () => {
-      const key = c.dataset.key;
-      S.taskDone[key] = !S.taskDone[key];
-      gasPost({action:"updateProgress", taskKey:key, status:S.taskDone[key]?"complete":"pending"});
-      render();
-    });
-  });
-
-  // Toolkit buttons
-  document.querySelectorAll(".toolkit-btn").forEach(b => {
-    b.addEventListener("click", () => {
-      const idx = parseInt(b.dataset.idx);
-      const task = {...TASKS.p1[idx], idx};
-      setState({drawerTask:task});
-    });
-  });
-
-  // Nuclear launch button
-  document.getElementById("nuclear-btn")?.addEventListener("click", () => {
-    spawnConfetti();
-    setState({launched:true});
-  });
-
-  // Go to roadmap after launch
-  document.getElementById("go-roadmap")?.addEventListener("click", () => setState({tab:"roadmap"}));
-
-  // Drawer generate button
-  document.getElementById("gen-drawer-btn")?.addEventListener("click", async () => {
-    const task = S.drawerTask;
-    const idea = S.idea;
-    const body = document.getElementById("drawer-body");
-    if (!body) return;
-    body.innerHTML = `<div style="text-align:center;padding:50px"><div class="spinner" style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating your plan...</div></div>`;
-    const prompts = [
-      `Business: "${idea?.name}". Write a 6-step market validation plan with search terms, subreddits, and qualifying questions.`,
-      `Business: "${idea?.name}". Identify 5 competitors and how to position against them.`,
-      `Business: "${idea?.name}". USP: ${idea?.usp}. Write 3 irresistible offer variants with price and pitch.`,
-      `Business: "${idea?.name}". Write complete landing page copy: headline, bullets, FAQs, CTA.`,
-      `Business: "${idea?.name}". Exact step-by-step Gumroad setup guide.`,
+    </div>`;
+  box.querySelector("#closeD").onclick=()=>{S.drawer=null;render()};
+  box.querySelector("#genBtn").onclick=async()=>{
+    const body=box.querySelector("#dBody");
+    body.innerHTML=`<div style="text-align:center;padding:50px"><div style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating...</div></div>`;
+    const prompts=[
+      `Business: "${idea?.name}". Write a 6-step market validation plan with search terms, 3 subreddits to check, and 3 qualifying questions for prospects.`,
+      `Business: "${idea?.name}". Name 5 likely competitors, what differentiates my offer, and the exact positioning strategy to win.`,
+      `Business: "${idea?.name}". Write 3 irresistible offer variants — price, what is included, one-line pitch each.`,
+      `Business: "${idea?.name}". Write complete landing page copy: headline, subheadline, 3 benefit bullets, 3 FAQs, CTA text. Ready to paste.`,
+      `Business: "${idea?.name}". Exact Gumroad setup guide: product creation, pricing, checkout, first refund handling.`,
       `Business: "${idea?.name}". Write 3 lead magnet ideas and full outline for the best one.`,
-      `Business: "${idea?.name}". Write launch day war room plan with 30-min check-in metrics.`,
+      `Business: "${idea?.name}". Launch day war room: what to post first, metrics every 30 min, plan B if zero sales in 3 hours.`,
     ];
-    const result = await askClaude(prompts[task?.idx||0]);
-    body.innerHTML = `
+    const result=await callAI(prompts[t.idx]||prompts[0]);
+    body.innerHTML=`
       <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px;font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${result}</div>
       <div style="display:flex;gap:10px;margin-top:14px">
-        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.querySelector('#drawer-body pre, #drawer-body div').textContent)">📋 Copy All</button>
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('gen-drawer-btn').click()">🔄 Regenerate</button>
+        <button class="btn btn-g sm" id="cpD">📋 Copy All</button>
+        <button class="btn btn-g sm" id="rgD">🔄 Regenerate</button>
       </div>`;
-  });
-
-  // Close drawer
-  document.getElementById("close-drawer")?.addEventListener("click", () => setState({drawerTask:null}));
-
-  // Script type buttons
-  document.querySelectorAll(".script-type-btn").forEach(b => {
-    b.addEventListener("click", async () => {
-      const type = b.dataset.type;
-      S.scriptActive = type;
-      if (S.scriptOuts[type]) { render(); return; }
-      if (!S.idea) return;
-      S.scriptLoading[type] = true;
-      render();
-      const COPY_PROMPTS = {
-        reddit:   `Write a Reddit launch post for: "${S.idea.name}". Story-first, reveal product at end. 300-word body.`,
-        twitter:  `Write an 8-tweet viral thread for: "${S.idea.name}". Tweet 1 is scroll-stopping. Number each "1/".`,
-        cold_dm:  `Write 3 cold DM versions for: "${S.idea.name}". Short (50w), Medium (100w), Story (200w). Human tone.`,
-        linkedin: `Write a LinkedIn launch post for: "${S.idea.name}". Hook, problem, solution, CTA in comments.`,
-        email:    `Write a launch email for: "${S.idea.name}". Subject (2 variants), preview, full body, PS line.`,
-      };
-      const copy = await askClaude(COPY_PROMPTS[type]||COPY_PROMPTS.reddit, "You are an elite copywriter. Be specific and conversion-focused.");
-      S.scriptOuts[type] = copy;
-      S.scriptLoading[type] = false;
-      render();
-    });
-  });
-
-  // Copy static scripts
-  document.querySelector(".copy-static-scripts")?.addEventListener("click", () => S.idea && navigator.clipboard.writeText(S.idea.scripts));
-  document.querySelector(".copy-static-scale")?.addEventListener("click",   () => S.idea && navigator.clipboard.writeText(S.idea.scale));
-
-  // Roadmap task checkboxes
-  document.querySelectorAll(".task-check").forEach(cb => {
-    cb.addEventListener("change", e => {
-      const key = e.target.dataset.key;
-      S.taskDone[key] = e.target.checked;
-      gasPost({action:"updateProgress", taskKey:key, status:e.target.checked?"complete":"pending"});
-      render();
-    });
-  });
-
-  // Notes
-  document.getElementById("notes-area")?.addEventListener("input", e => {
-    S.notes = e.target.value;
-    S.notesSaved = false;
-    clearTimeout(notesTimer);
-    notesTimer = setTimeout(async () => {
-      await gasPost({action:"saveNotes", notes:S.notes});
-      S.notesSaved = true;
-      render();
-    }, 60000);
-  });
-  document.getElementById("copy-notes")?.addEventListener("click", () => navigator.clipboard.writeText(S.notes));
-
-  // Modal open (if needed)
-  if (S.modalOpen) bindModalEvents();
+    body.querySelector("#cpD").onclick=()=>navigator.clipboard.writeText(result);
+    body.querySelector("#rgD").onclick=()=>box.querySelector("#genBtn").click();
+  };
+  ov.appendChild(box);return ov;
 }
 
-function bindHomeEvents() {
-  document.getElementById("home-find-idea")?.addEventListener("click", () => {
-    setState({modalOpen:true});
-  });
-  document.getElementById("home-demo")?.addEventListener("click", () => {
-    setState({idea:IDEAS[0], page:"dashboard", tab:"launch"});
-  });
+function buildModal(){
+  const ov=el("div","overlay");
+  ov.onclick=e=>{if(e.target===ov){S.modal=false;S.qaStep=0;S.qaAnswers={};S.qaIdeas=[];S.qaLoading=false;render()}};
+  const box=el("div","");
+  Object.assign(box.style,{background:"#0A0A0F",border:"1px solid rgba(0,122,255,.35)",borderRadius:"24px",
+    width:"100%",maxWidth:"880px",maxHeight:"88vh",overflow:"hidden",display:"flex",flexDirection:"column",
+    boxShadow:"0 0 100px rgba(0,122,255,.12)"});
+  box.innerHTML=`
+    <div style="padding:24px 30px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:10px;font-weight:700;padding:2px 9px;border-radius:5px;display:inline-block;margin-bottom:8px">IDEA ENGINE — 100 PREMIUM AI BUSINESSES</span>
+        <div style="font-size:22px;font-weight:800">Find Your Perfect Business</div>
+      </div>
+      <button id="closeM" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="mBody" style="flex:1;overflow:auto;padding:26px 30px"></div>`;
+  box.querySelector("#closeM").onclick=()=>{S.modal=false;S.qaStep=0;S.qaAnswers={};S.qaIdeas=[];S.qaLoading=false;render()};
+  ov.appendChild(box);
+  showModalStep(box.querySelector("#mBody"));
+  return ov;
 }
 
-function bindModalEvents() {
-  document.getElementById("close-modal")?.addEventListener("click", () => {
-    setState({modalOpen:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false});
-  });
-
-  document.getElementById("qa-input")?.addEventListener("input", e => {
-    S.qaAnswers[S.qaStep] = e.target.value;
-  });
-
-  document.getElementById("qa-back")?.addEventListener("click", () => {
-    if (S.qaStep > 0) setState({qaStep: S.qaStep-1});
-  });
-
-  document.getElementById("qa-next")?.addEventListener("click", handleQANext);
-
-  document.getElementById("qa-input")?.addEventListener("keydown", e => {
-    if (e.key === "Enter") handleQANext();
-  });
-
-  // Idea pick buttons
-  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx);
-      const idea = S.qaIdeas[idx];
-      if (idea) {
-        S.idea = idea;
-        S.modalOpen = false;
-        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
-        S.page = "dashboard";
-        S.tab = "launch";
-        gasPost({action:"populateRoadmap",ideaId:idea.id,userProfile:{skillset:S.qaAnswers[0]}});
-        render();
-      }
-    });
-  });
-}
-
-async function handleQANext() {
-  const val = S.qaAnswers[S.qaStep] || "";
-  if (!val) return;
-  if (S.qaStep < QUESTIONS.length - 1) {
-    S.qaStep++;
-    // Re-render modal body for next question
-    const body = document.getElementById("modal-body");
-    if (body) { body.innerHTML = renderModalBody(); bindModalAfterRender(); }
+function showModalStep(body){
+  if(S.qaLoading){
+    body.innerHTML=`<div style="text-align:center;padding:70px 0">
+      <div style="width:52px;height:52px;border:4px solid rgba(0,122,255,.2);border-top-color:#007AFF;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 18px"></div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px">Analyzing Your Profile...</div>
+      <div style="color:#4A4A5A;font-size:13px">Matching from 100 premium ideas</div>
+    </div>`;
     return;
   }
-  // Last question — generate ideas
-  S.qaLoading = true;
-  const body = document.getElementById("modal-body");
-  if (body) { body.innerHTML = renderModalBody(); }
-  try {
-    const data = await gasPost({action:"filterTop20",userProfile:{skillset:S.qaAnswers[0],audience:S.qaAnswers[1],format:S.qaAnswers[2],time:S.qaAnswers[3],revenue:S.qaAnswers[4]}});
-    if (data?.top20?.length > 0) { S.qaIdeas = data.top20; }
-    else throw new Error("no results");
-  } catch {
-    S.qaIdeas = IDEAS.map(i=>({...i,conf:75+Math.floor(Math.random()*24)})).sort((a,b)=>b.conf-a.conf);
-  }
-  S.qaLoading = false;
-  S.qaStep = QUESTIONS.length;
-  if (body) { body.innerHTML = renderModalBody(); bindModalAfterRender(); }
-}
-
-function bindModalAfterRender() {
-  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx);
-      const idea = S.qaIdeas[idx];
-      if (idea) {
-        S.idea = idea; S.modalOpen = false;
-        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
-        S.page = "dashboard"; S.tab = "launch";
+  if(S.qaIdeas.length>0&&S.qaStep>=QS.length){
+    // Results screen
+    body.innerHTML=`<div style="font-size:12px;color:#34D399;font-weight:700;margin-bottom:18px">✨ ${S.qaIdeas.length} ideas matched — ranked by confidence</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px" id="ideaCards"></div>`;
+    const grid=body.querySelector("#ideaCards");
+    S.qaIdeas.forEach((idea,i)=>{
+      const diff=parseInt(idea.diff)||3;
+      const dc={1:"#34D399",2:"#34D399",3:"#F59E0B",4:"#EF4444",5:"#EF4444"}[diff];
+      const card=el("div","glass");
+      Object.assign(card.style,{padding:"18px",cursor:"pointer",transition:"all .2s"});
+      card.onmouseover=()=>{card.style.borderColor="rgba(0,122,255,.35)";card.style.background="rgba(0,122,255,.05)"};
+      card.onmouseout=()=>{card.style.borderColor="rgba(255,255,255,.07)";card.style.background="rgba(255,255,255,.025)"};
+      card.innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <span style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px">${(idea.cat||"AI").split(" ")[0]}</span>
+          <span style="font-size:14px;font-weight:800;color:#34D399">${idea.conf||80}%</span>
+        </div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:5px;line-height:1.3">${idea.name}</div>
+        <div style="font-size:11px;color:#4A4A5A;margin-bottom:12px;line-height:1.5">${idea.usp}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Revenue</span><span style="font-size:10px;color:#34D399;font-weight:700">$1K–$10K/mo</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#4A4A5A">Difficulty</span><div style="display:flex;gap:2px">${[1,2,3,4,5].map(d=>`<div style="width:7px;height:7px;border-radius:2px;background:${d<=diff?dc:"rgba(255,255,255,.1)"}"></div>`).join("")}</div></div>
+          <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Launch Speed</span><span style="font-size:10px;color:#F59E0B;font-weight:700">7 hours</span></div>
+        </div>`;
+      const startBtn=el("button","btn btn-p sm");
+      startBtn.style.width="100%";startBtn.textContent="🚀 Start Execution";
+      startBtn.onclick=e=>{
+        e.stopPropagation();
+        S.idea=idea;S.modal=false;S.qaStep=0;S.qaAnswers={};S.qaIdeas=[];S.qaLoading=false;
+        S.page="dashboard";S.tab="launch";
         gasPost({action:"populateRoadmap",ideaId:idea.id});
         render();
-      }
+      };
+      card.appendChild(startBtn);
+      grid.appendChild(card);
     });
+    return;
+  }
+
+  // Question screen
+  const step=S.qaStep;
+  const q=QS[step];
+  const sel=S.qaAnswers[step]||"";
+  const bars=QS.map((_,i)=>`<div style="flex:1;height:3px;border-radius:2px;background:${i<=step?"#007AFF":"rgba(255,255,255,.07)"}"></div>`).join("");
+
+  const stepDiv=el("div","");stepDiv.style.animation="fadeUp .3s ease";
+  stepDiv.innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:26px">${bars}</div>
+    <div style="font-size:12px;color:#007AFF;font-weight:700;margin-bottom:8px">QUESTION ${step+1} OF ${QS.length}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span style="font-size:26px">${q.icon}</span>
+      <div style="font-size:19px;font-weight:700">${q.q}</div>
+    </div>
+    <div id="optsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <button class="btn btn-g" id="backBtn" ${step===0?"disabled":""}>← Back</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="pickHint" style="font-size:12px;color:#4A4A5A;display:${sel?"none":"block"}">👆 Pick one to continue</span>
+        <button class="btn btn-p" id="nextBtn" ${!sel?"disabled":""} style="opacity:${sel?1:.4}">${step===QS.length-1?"✨ Find My Ideas →":"Next →"}</button>
+      </div>
+    </div>`;
+
+  // Option buttons
+  const grid=stepDiv.querySelector("#optsGrid");
+  q.opts.forEach(opt=>{
+    const isSel=sel===opt;
+    const b=el("button","btn");
+    Object.assign(b.style,{padding:"12px 16px",borderRadius:"10px",width:"100%",textAlign:"left",
+      border:`2px solid ${isSel?"#007AFF":"rgba(255,255,255,.1)"}`,
+      background:isSel?"rgba(0,122,255,.12)":"rgba(255,255,255,.03)",
+      color:isSel?"#007AFF":"#C8C8D0",fontWeight:isSel?"700":"500",
+      display:"flex",alignItems:"center",gap:"10px",fontSize:"13px"});
+    b.innerHTML=`<span style="width:16px;height:16px;border-radius:50%;flex-shrink:0;
+      border:2px solid ${isSel?"#007AFF":"rgba(255,255,255,.25)"};background:${isSel?"#007AFF":"transparent"};
+      display:flex;align-items:center;justify-content:center">
+      ${isSel?'<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:block"></span>':""}
+    </span>${opt}`;
+    b.onclick=()=>{
+      S.qaAnswers[step]=opt;
+      // Update all buttons visually
+      grid.querySelectorAll("button").forEach(btn=>{
+        const s=btn.textContent.trim()===opt;
+        btn.style.borderColor=s?"#007AFF":"rgba(255,255,255,.1)";
+        btn.style.background=s?"rgba(0,122,255,.12)":"rgba(255,255,255,.03)";
+        btn.style.color=s?"#007AFF":"#C8C8D0";
+        btn.style.fontWeight=s?"700":"500";
+      });
+      // Enable Next button
+      const nb=stepDiv.querySelector("#nextBtn");
+      if(nb){nb.disabled=false;nb.style.opacity="1";}
+      const hint=stepDiv.querySelector("#pickHint");
+      if(hint)hint.style.display="none";
+    };
+    grid.appendChild(b);
   });
+
+  // Back
+  stepDiv.querySelector("#backBtn").onclick=()=>{
+    if(S.qaStep>0){S.qaStep--;showModalStep(body);}
+  };
+
+  // Next
+  stepDiv.querySelector("#nextBtn").onclick=async()=>{
+    const val=S.qaAnswers[S.qaStep];
+    if(!val)return;
+    if(S.qaStep<QS.length-1){
+      S.qaStep++;
+      showModalStep(body);
+      return;
+    }
+    // Last step — get ideas
+    S.qaLoading=true;
+    showModalStep(body);
+    try{
+      const data=await gasPost({action:"filterTop20",userProfile:{
+        skillset:S.qaAnswers[0],audience:S.qaAnswers[1],
+        format:S.qaAnswers[2],time:S.qaAnswers[3],revenue:S.qaAnswers[4]
+      }});
+      S.qaIdeas=data?.top20?.length>0?data.top20:null;
+      if(!S.qaIdeas)throw new Error();
+    }catch{
+      // Local fallback
+      S.qaIdeas=IDEAS.map(i=>({...i,conf:75+Math.floor(Math.random()*24)})).sort((a,b)=>b.conf-a.conf);
+    }
+    S.qaLoading=false;
+    S.qaStep=QS.length;
+    showModalStep(body);
+  };
+
+  body.innerHTML="";
+  body.appendChild(stepDiv);
 }
 
-// ── selectQAOption — called by option buttons ─────
-function selectQAOption(val) {
-  S.qaAnswers[S.qaStep] = val;
-  // Update option buttons visually without full re-render
-  document.querySelectorAll(".qa-opt-btn").forEach(btn => {
-    const isSel = btn.dataset.val === val;
-    btn.style.borderColor = isSel ? "#007AFF" : "rgba(255,255,255,.1)";
-    btn.style.background   = isSel ? "rgba(0,122,255,.12)" : "rgba(255,255,255,.03)";
-    btn.style.color        = isSel ? "#007AFF" : "#C8C8D0";
-    btn.style.fontWeight   = isSel ? "700" : "500";
-    const dot   = btn.querySelector(".opt-dot");
-    const inner = btn.querySelector("span span");
-    if (dot)   { dot.style.borderColor = isSel ? "#007AFF" : "rgba(255,255,255,.25)"; dot.style.background = isSel ? "#007AFF" : "transparent"; }
-    if (inner) { inner.style.display = isSel ? "block" : "none"; }
-  });
-  // Enable Next button
-  const nb = document.getElementById("qa-next-btn");
-  if (nb) { nb.disabled = false; nb.style.opacity = "1"; }
-  // Hide hint
-  const hint = document.querySelector("#modal-body span[style*='Pick one']");
-  if (hint) hint.style.display = "none";
-}
-
-// ── pickIdea — called by Start Execution button ───
-function pickIdea(idx) {
-  const idea = S.qaIdeas[idx];
-  if (!idea) return;
-  S.idea = idea;
-  S.modalOpen = false;
-  S.qaStep = 0;
-  S.qaAnswers = {};
-  S.qaIdeas = [];
-  S.page = "dashboard";
-  S.tab = "launch";
-  gasPost({action:"populateRoadmap", ideaId:idea.id});
-  render();
-}
-
-// Expose globally
-window.handleQANext = handleQANext;
-window.pickIdea = pickIdea;
-window.selectQAOption = selectQAOption;
-window.setState = setState;
-window.S = S;
-window.renderModalBody = renderModalBody;
-window.bindModalAfterRender = bindModalAfterRender;
-window.bindDashEvents = bindDashEvents;
-window.bindHomeEvents = bindHomeEvents;
-window.bindModalEvents = bindModalEvents;
-window.render = render;
-
+// START
 render();
 </script>
 </body>
