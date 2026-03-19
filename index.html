@@ -3,898 +3,1101 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚡ Execution OS — 24-Hour AI Profit Engine</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
+<title>⚡ Execution OS</title>
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html,body,#root{height:100%;background:#0A0A0B}
-  body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;color:#F0F0F5}
-  *{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent}
-  *::-webkit-scrollbar{width:4px;height:4px}
-  *::-webkit-scrollbar-track{background:transparent}
-  *::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
-  input,textarea,button,select{font-family:inherit}
-  a{color:inherit;text-decoration:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-  @keyframes nuclearPulse{0%,100%{box-shadow:0 0 30px rgba(239,68,68,0.5),0 0 60px rgba(239,68,68,0.2)}50%{box-shadow:0 0 70px rgba(239,68,68,0.8),0 0 130px rgba(239,68,68,0.4)}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,122,255,0.2)}50%{box-shadow:0 0 40px rgba(0,122,255,0.5)}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0A0A0B;color:#F0F0F5;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif}
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+a{color:inherit;text-decoration:none}
+input,textarea,button{font-family:inherit}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes nuclearPulse{0%,100%{box-shadow:0 0 30px rgba(239,68,68,.5),0 0 70px rgba(239,68,68,.2)}50%{box-shadow:0 0 70px rgba(239,68,68,.9),0 0 140px rgba(239,68,68,.4)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(0,122,255,0)}50%{box-shadow:0 0 30px rgba(0,122,255,.25)}}
+@keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* Layout */
+#app{height:100vh;display:flex;flex-direction:column}
+.dashboard{height:100vh;display:flex;overflow:hidden}
+.sidebar{width:210px;flex-shrink:0;background:#0F0F13;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:54px;background:rgba(10,10,11,.95);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;position:sticky;top:0;z-index:50}
+.content{flex:1;overflow:auto;padding:26px 22px}
+
+/* Glass card */
+.glass{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;backdrop-filter:blur(20px)}
+
+/* Buttons */
+.btn{border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;padding:11px 22px;transition:all .15s;letter-spacing:.3px;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,#007AFF,#0055FF);color:#fff;box-shadow:0 4px 20px rgba(0,122,255,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);color:#9191A4;border:1px solid rgba(255,255,255,.07)}
+.btn-success{background:linear-gradient(135deg,#34D399,#059669);color:#fff}
+.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff}
+.btn-sm{padding:8px 14px;font-size:12px}
+.btn-lg{padding:16px 40px;font-size:16px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.8px}
+
+/* Nav */
+.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:#9191A4;font-weight:500;font-size:13px;transition:all .15s;text-align:left;width:100%;font-family:inherit}
+.nav-btn.active{background:rgba(0,122,255,.12);color:#007AFF;font-weight:700}
+
+/* Modal overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(12px)}
+.modal{background:#0A0A0F;border:1px solid rgba(0,122,255,.35);border-radius:24px;width:100%;max-width:860px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 100px rgba(0,122,255,.12)}
+
+/* Progress bar */
+.prog-wrap{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.prog-bar{height:100%;border-radius:3px;transition:width .5s ease}
+
+/* Task card */
+.task-card{padding:16px 20px;transition:all .3s;cursor:default}
+.task-card.active-card{animation:glow 3s ease-in-out infinite}
+
+/* Confetti */
+.cf-piece{position:fixed;top:-12px;pointer-events:none;border-radius:50%;animation:cfFall linear forwards}
+
+/* Spinner */
+.spinner{border-radius:50%;animation:spin .7s linear infinite}
+
+/* Textarea */
+textarea{resize:none;outline:none;background:transparent;border:none;color:#C8C8D0;font-size:14px;line-height:1.75;padding:18px;width:100%;font-family:'SF Mono','Fira Code',monospace}
+
+/* Input */
+.field{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:15px 18px;font-size:15px;color:#F0F0F5;outline:none;transition:border-color .2s;font-family:inherit}
+.field:focus{border-color:#007AFF}
+
+/* Grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.grid-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+
+/* Onboarding */
+.onboard{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;background:radial-gradient(ellipse at 50% 30%,rgba(0,122,255,.07) 0%,transparent 60%)}
+
+pre{white-space:pre-wrap;word-break:break-word}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-// ══════════════════════════════════════════════════════════════
-//  ⚡ EXECUTION OS — Complete Single File
-//  GAS URL is pre-configured below
-// ══════════════════════════════════════════════════════════════
+<div id="app"></div>
 
-const { useState, useEffect, useRef, useReducer, useContext, createContext, useCallback } = React;
-const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } = Recharts;
+<script>
+// ═══════════════════════════════════════════════════
+//  EXECUTION OS — Pure Vanilla JS
+//  GAS URL pre-configured
+// ═══════════════════════════════════════════════════
 
-// ── CONFIG ────────────────────────────────────────────────────
-const GAS_URL = "https://script.google.com/macros/s/AKfycbw05ABBcpVEtdS-NljdYopE3asDzeYAhTUZannmAd5ieizfQShO-z4SA7jjq7ezd8l_/exec";
-const CLAUDE_MODEL = "claude-sonnet-4-20250514";
-const C = {
-  bg:"#0A0A0B", surface:"#0F0F13", surfaceHi:"#16161C",
-  border:"rgba(255,255,255,0.07)", borderBlue:"rgba(0,122,255,0.35)",
-  blue:"#007AFF", blueDark:"#0055FF", green:"#34D399",
-  amber:"#F59E0B", pink:"#EC4899", red:"#EF4444",
-  text:"#F0F0F5", sub:"#9191A4", muted:"#4A4A5A",
-};
+const GAS = "https://script.google.com/macros/s/AKfycbw05ABBcpVEtdS-NljdYopE3asDzeYAhTUZannmAd5ieizfQShO-z4SA7jjq7ezd8l_/exec";
+const CLAUDE = "claude-sonnet-4-20250514";
 
-// ── DEMO DATA ─────────────────────────────────────────────────
+// ── DATA ─────────────────────────────────────────
 const IDEAS = [
-  {id:"B001",category:"B2B SaaS/Automation",idea_name:"AI Inventory Demand Predictor",usp:"Reduces overstock 40% using ML forecasting for Shopify stores",difficulty:3,launch_action:"H1: Sign up Replit + Supabase\nH2: Connect Shopify API\nH3: Train ARIMA model on demo data\nH4: Build dashboard UI\nH5: Create Stripe billing\nH6: List on AppSumo LTD\nH7: Cold email 20 Shopify stores",marketing_script:"REDDIT: 'I built a tool predicting Q4 stockouts 3 weeks early'\nTWITTER: 'The $50K mistake most Shopify stores make in November'\nCOLD DM: 'Hey, do you have inventory buffer logic set up for peak season?'",scaling_roadmap:"W1: 10 beta users free\nW2: Case study\nW3: ProductHunt launch\nW4: $97/mo\nM2: Agency partners\nM3: Multi-platform connectors",confidence:"95%"},
-  {id:"H001",category:"High-Ticket Digital Services",idea_name:"AI Podcast Clip Monetization",usp:"Turns 1 podcast into 30 viral clips with captions — done for you",difficulty:2,launch_action:"H1: Descript/Opus API setup\nH2: Caption generator build\nH3: Hook analyzer prompt\nH4: Google Drive delivery system\nH5: Price at $500/mo\nH6: DM 20 podcasters on Twitter\nH7: Post before/after sample",marketing_script:"TWITTER: 'I turned a 2-hour podcast into 34 viral clips in 3 hours'\nCOLD DM: 'Your content is dying after 48hrs. I repurpose it into 30 clips/month. Want 5 free?'",scaling_roadmap:"W1: 3 free trials\nW2: Results reel\nW3: $799/mo\nW4: Hire VA\nM2: YouTube Shorts tier\nM3: Bundle $1,500/mo",confidence:"91%"},
-  {id:"M001",category:"Micro-Niche Content",idea_name:"AI Legal Compliance Newsletter",usp:"Weekly AI-curated employment law changes per US state for HR managers",difficulty:2,launch_action:"H1: Legal news RSS feeds\nH2: Claude summarization pipeline\nH3: Beehiiv newsletter setup\nH4: Subscription at $49/mo\nH5: Carrd landing page\nH6: Post in HR Facebook groups\nH7: Cold email 30 HR managers",marketing_script:"LINKEDIN: 'HR managers: 3 compliance changes last month affected your handbook'\nTWITTER: 'Employment law changes 400+ times per year. We track every one.'",scaling_roadmap:"W1: 100 free subscribers\nW2: $29/mo\nW3: $49/mo\nW4: Second state\nM2: 10 states\nM3: Law firm white-label",confidence:"88%"},
-  {id:"R001",category:"Real Estate & Finance AI",idea_name:"AI Fix-and-Flip ROI Calculator",usp:"Analyzes any address — ARV, repair costs, profit margin — in 60 seconds",difficulty:3,launch_action:"H1: Property data API (Attom)\nH2: Repair cost model\nH3: ARV calculator\nH4: Report dashboard\nH5: $49/mo subscription\nH6: BiggerPockets thread\nH7: DM 30 RE investors",marketing_script:"TWITTER: 'I analyzed 200 fix-and-flip deals. 5 cost categories kill most profits.'\nREDDIT: 'Built a tool calculating fix-and-flip ROI in 60 seconds. Free analysis:'",scaling_roadmap:"W1: 50 free analyses\nW2: $29/mo\nW3: $49/mo\nW4: Contractor network\nM2: REIA clubs\nM3: Lender deals",confidence:"85%"},
-  {id:"P001",category:"Personalized AI Utilities",idea_name:"AI Career Pivot Coach",usp:"Personalized 90-day plan for laid-off tech workers — resume + skill gap + jobs",difficulty:2,launch_action:"H1: Career assessment form\nH2: Role matching algorithm\nH3: Skill gap analyzer\nH4: Claude plan generator\nH5: $199 one-time\nH6: r/layoffs post\nH7: DM laid-off workers on LinkedIn",marketing_script:"LINKEDIN: '90-day career pivot framework used by 47 engineers after FAANG layoffs'\nREDDIT: 'Used AI to map my pivot. Better job, higher salary. Full plan inside.'",scaling_roadmap:"W1: 20 free plans\nW2: $99 launch\nW3: $199 standard\nW4: Resume add-on\nM2: Coaching community\nM3: Bootcamp partnership",confidence:"82%"},
-  {id:"B002",category:"B2B SaaS/Automation",idea_name:"AI Contract Risk Analyzer",usp:"Scans NDAs in 60 seconds, flags 23 risk categories, saves $500/hr lawyer fees",difficulty:3,launch_action:"H1: Claude API setup\nH2: PDF parser\nH3: Risk detection prompts\nH4: React upload UI\nH5: $29/scan Stripe\nH6: r/freelance post\nH7: Email 50 Upwork freelancers",marketing_script:"REDDIT: 'Found a $12K liability clause my lawyer missed — AI caught it in 60 seconds'\nCOLD DM: 'Freelancers lose thousands to bad contracts. Our AI catches them fast.'",scaling_roadmap:"W1: 100 free scans\nW2: Freelancer groups\nW3: $49/mo\nW4: E-signature integration\nM2: Law firm white-label\nM3: Enterprise $499/mo",confidence:"93%"},
-  {id:"H002",category:"High-Ticket Digital Services",idea_name:"AI Executive LinkedIn Ghostwriting",usp:"15-min weekly interview → 20 posts + 2 newsletters + full content calendar",difficulty:2,launch_action:"H1: Tally intake form\nH2: Content extraction prompt\nH3: Scheduling system\nH4: Approval workflow\nH5: $1,500/mo per exec\nH6: DM 15 CEOs on LinkedIn\nH7: Post case study",marketing_script:"LINKEDIN: 'I write LinkedIn content for 7-figure executives. Consistency wins.'\nCOLD DM: 'You post once every 6 weeks. I help executives post daily — 15 min/week from you.'",scaling_roadmap:"W1: 2 clients $1K/mo\nW2: Systematize\nW3: $1,500/mo\nW4: Junior writer\nM2: 5 clients $7.5K MRR\nM3: Agency model",confidence:"90%"},
-  {id:"P002",category:"Personalized AI Utilities",idea_name:"AI Executive Coaching Chat",usp:"AI executive coach 24/7 — leadership, promotion strategy, communication challenges",difficulty:2,launch_action:"H1: Coaching framework\nH2: Claude system prompt\nH3: Chat interface\nH4: Memory system\nH5: $79/mo\nH6: r/managers post\nH7: DM HR professionals",marketing_script:"LINKEDIN: 'Executive coaches charge $500/hr. I built an AI version for $79/month.'\nREDDIT: 'Asked AI executive coach how to handle a difficult skip-level. Here is what it said.'",scaling_roadmap:"W1: 50 free trials\nW2: $39/mo\nW3: $79/mo\nW4: Team plans\nM2: L&D deals\nM3: Corporate licensing",confidence:"83%"},
+  {id:"B001",cat:"B2B SaaS",name:"AI Inventory Demand Predictor",usp:"Reduces overstock 40% using ML for Shopify stores",diff:3,launch:"H1: Sign up Replit+Supabase\nH2: Connect Shopify API\nH3: Train model on demo data\nH4: Build dashboard UI\nH5: Create Stripe billing\nH6: List on AppSumo\nH7: Cold email 20 stores",scripts:"REDDIT: 'I predicted Q4 stockouts 3 weeks early'\nTWITTER: 'The $50K mistake most Shopify stores make'\nCOLD DM: 'Do you have inventory buffer logic for peak season?'",scale:"W1:10 beta free\nW2:Case study\nW3:ProductHunt\nW4:$97/mo\nM2:Agency partners\nM3:Multi-platform",conf:95},
+  {id:"H001",cat:"Digital Services",name:"AI Podcast Clip Service",usp:"Turns 1 podcast into 30 viral clips — done for you",diff:2,launch:"H1: Descript/Opus setup\nH2: Caption generator\nH3: Hook analyzer prompt\nH4: Drive delivery\nH5: $500/mo pricing\nH6: DM 20 podcasters\nH7: Post before/after",scripts:"TWITTER: 'Turned a 2-hr podcast into 34 viral clips in 3hrs'\nCOLD DM: 'Your content dies after 48hrs. I make 30 clips/month. Free samples?'",scale:"W1:3 free trials\nW2:Results reel\nW3:$799/mo\nW4:Hire VA\nM2:YouTube Shorts\nM3:$1,500 bundle",conf:91},
+  {id:"M001",cat:"Niche Content",name:"AI Legal Compliance Newsletter",usp:"Weekly law changes per US state — sold to HR managers",diff:2,launch:"H1: Legal RSS feeds\nH2: Claude pipeline\nH3: Beehiiv setup\nH4: $49/mo sub\nH5: Carrd landing page\nH6: HR Facebook groups\nH7: Cold email 30 HR managers",scripts:"LINKEDIN: 'HR: 3 compliance changes last month affected your handbook'\nTWITTER: 'Employment law changes 400+ times/year. We track every one.'",scale:"W1:100 free subs\nW2:$29/mo\nW3:$49/mo\nW4:Second state\nM2:10 states\nM3:Law firm white-label",conf:88},
+  {id:"R001",cat:"Real Estate AI",name:"AI Fix-and-Flip ROI Calculator",usp:"ARV, repair costs, profit margin in 60 seconds",diff:3,launch:"H1: Attom API\nH2: Repair cost model\nH3: ARV calculator\nH4: Report dashboard\nH5: $49/mo\nH6: BiggerPockets thread\nH7: DM 30 investors",scripts:"TWITTER: 'Analyzed 200 fix-and-flip deals. 5 categories kill most profits.'\nREDDIT: 'Fix-and-flip ROI in 60 seconds. Free analysis:'",scale:"W1:50 free\nW2:$29/mo\nW3:$49/mo\nW4:Contractor network\nM2:REIA clubs\nM3:Lender deals",conf:85},
+  {id:"P001",cat:"AI Utilities",name:"AI Career Pivot Coach",usp:"90-day plan for laid-off tech workers — resume+skill gap+jobs",diff:2,launch:"H1: Assessment form\nH2: Role matching\nH3: Skill gap analyzer\nH4: Claude plan gen\nH5: $199 one-time\nH6: r/layoffs post\nH7: DM workers on LinkedIn",scripts:"LINKEDIN: '90-day pivot framework used by 47 engineers after FAANG'\nREDDIT: 'Used AI to map my pivot. Better job, higher salary.'",scale:"W1:20 free\nW2:$99\nW3:$199\nW4:Resume add-on\nM2:Coaching community\nM3:Bootcamp deal",conf:82},
+  {id:"B002",cat:"B2B SaaS",name:"AI Contract Risk Analyzer",usp:"Scans NDAs in 60 seconds, flags 23 risk categories",diff:3,launch:"H1: Claude API\nH2: PDF parser\nH3: Risk prompts\nH4: Upload UI\nH5: $29/scan\nH6: r/freelance\nH7: Email Upwork freelancers",scripts:"REDDIT: 'Found $12K liability clause the lawyer missed'\nCOLD DM: 'Freelancers lose thousands to bad contracts. AI catches them fast.'",scale:"W1:100 free\nW2:Freelancer groups\nW3:$49/mo\nW4:E-signature\nM2:Law white-label\nM3:Enterprise $499",conf:93},
+  {id:"H002",cat:"Digital Services",name:"AI LinkedIn Ghostwriting",usp:"15-min interview → 20 posts + newsletter + content calendar",diff:2,launch:"H1: Tally intake\nH2: Extraction prompt\nH3: Scheduling system\nH4: Approval workflow\nH5: $1,500/mo\nH6: DM 15 CEOs\nH7: Post case study",scripts:"LINKEDIN: 'I write content for 7-figure executives. Consistency wins.'\nCOLD DM: 'You post once/6 weeks. I help you post daily — 15 min/week from you.'",scale:"W1:2 clients $1K\nW2:Systematize\nW3:$1,500/mo\nW4:Junior writer\nM2:5 clients $7.5K\nM3:Agency model",conf:90},
+  {id:"P002",cat:"AI Utilities",name:"AI Executive Coaching Chat",usp:"24/7 AI coach — leadership, promotion strategy, communication",diff:2,launch:"H1: Framework\nH2: System prompt\nH3: Chat interface\nH4: Memory system\nH5: $79/mo\nH6: r/managers\nH7: DM HR professionals",scripts:"LINKEDIN: 'Executive coaches charge $500/hr. Built AI version for $79/mo'\nREDDIT: 'Asked AI exec coach about a difficult skip-level. Here is what it said.'",scale:"W1:50 free\nW2:$39/mo\nW3:$79/mo\nW4:Team plans\nM2:L&D deals\nM3:Corporate licensing",conf:83},
 ];
 
 const TASKS = {
-  phase1:[
-    {key:"p1-0",slot:"Hour 1",task:"Market Validation",action:"Research demand on Reddit, Twitter, Google Trends",tool:"Google Trends",status:"complete"},
-    {key:"p1-1",slot:"Hour 2",task:"Competitive Analysis",action:"Find 5 competitors, document pricing gaps",tool:"Similarweb",status:"complete"},
-    {key:"p1-2",slot:"Hour 3",task:"Offer Creation",action:"Define offer, pricing, and guarantee",tool:"Google Docs",status:"active"},
-    {key:"p1-3",slot:"Hour 4",task:"Landing Page",action:"Headline, 3 bullets, CTA — live in 1 hour",tool:"Carrd.co",status:"pending"},
-    {key:"p1-4",slot:"Hour 5",task:"Payment Setup",action:"Create product in Gumroad, test checkout",tool:"Gumroad",status:"pending"},
-    {key:"p1-5",slot:"Hour 6",task:"Lead Magnet",action:"Create a free resource for ideal customers",tool:"Canva",status:"pending"},
-    {key:"p1-6",slot:"Hour 7",task:"First Distribution",action:"Post on 3 platforms, DM 10 prospects",tool:"Twitter+Reddit",status:"pending"},
+  p1:[
+    {k:"t1",slot:"Hour 1",task:"Market Validation",action:"Research demand on Reddit, Twitter, Google Trends",tool:"Google Trends",done:false},
+    {k:"t2",slot:"Hour 2",task:"Competitive Analysis",action:"Find 5 competitors, document pricing gaps",tool:"Similarweb",done:false},
+    {k:"t3",slot:"Hour 3",task:"Offer Creation",action:"Define offer, pricing tiers, guarantee",tool:"Google Docs",done:false},
+    {k:"t4",slot:"Hour 4",task:"Landing Page",action:"Headline, 3 bullets, CTA — live in 1 hour",tool:"Carrd.co",done:false},
+    {k:"t5",slot:"Hour 5",task:"Payment Setup",action:"Create product in Gumroad, test checkout",tool:"Gumroad",done:false},
+    {k:"t6",slot:"Hour 6",task:"Lead Magnet",action:"Create a free resource for ideal customers",tool:"Canva",done:false},
+    {k:"t7",slot:"Hour 7",task:"First Distribution",action:"Post on 3 platforms, DM 10 prospects",tool:"Twitter+Reddit",done:false},
   ],
-  phase2:[
-    {key:"p2-0",slot:"Morning",task:"Reddit Launch Post",action:"Story-first post on 3 subreddits",tool:"Reddit",status:"pending"},
-    {key:"p2-1",slot:"Noon",task:"Twitter Thread",action:"8-tweet thread on your core problem",tool:"Twitter/X",status:"pending"},
-    {key:"p2-2",slot:"Afternoon",task:"Cold DM Campaign",action:"20 personalized DMs to ideal customers",tool:"LinkedIn DM",status:"pending"},
-    {key:"p2-3",slot:"Evening",task:"LinkedIn Post",action:"Case study or insight about your niche",tool:"LinkedIn",status:"pending"},
-    {key:"p2-4",slot:"Night",task:"Follow-up Sequence",action:"Email signups, pitch early-bird pricing",tool:"Beehiiv",status:"pending"},
+  p2:[
+    {k:"t8",slot:"Morning",task:"Reddit Launch Post",action:"Story-first post on 3 subreddits",tool:"Reddit",done:false},
+    {k:"t9",slot:"Noon",task:"Twitter Thread",action:"8-tweet thread on core problem",tool:"Twitter/X",done:false},
+    {k:"t10",slot:"Afternoon",task:"Cold DM Campaign",action:"20 personalized DMs to ideal customers",tool:"LinkedIn DM",done:false},
+    {k:"t11",slot:"Evening",task:"LinkedIn Post",action:"Case study or insight about your niche",tool:"LinkedIn",done:false},
+    {k:"t12",slot:"Night",task:"Follow-up Sequence",action:"Email signups, pitch early-bird pricing",tool:"Beehiiv",done:false},
   ],
-  phase3:[
-    {key:"p3-0",slot:"Day 1-2",task:"Optimize Landing Page",action:"Improve headline based on Day 1 feedback",tool:"Carrd/Hotjar",status:"pending"},
-    {key:"p3-1",slot:"Day 3",task:"First Customer Call",action:"Call first customer, gather raw feedback",tool:"Zoom",status:"pending"},
-    {key:"p3-2",slot:"Day 4-5",task:"Testimonials",action:"Request written/video testimonials",tool:"Tally.so",status:"pending"},
-    {key:"p3-3",slot:"Day 6",task:"Content Blitz",action:"Post 2x daily, highlight results",tool:"Buffer",status:"pending"},
-    {key:"p3-4",slot:"Day 7",task:"Revenue Review",action:"Calculate MRR, find top channel",tool:"Stripe Dashboard",status:"pending"},
+  p3:[
+    {k:"t13",slot:"Day 1-2",task:"Optimize Landing Page",action:"Improve headline based on feedback",tool:"Carrd/Hotjar",done:false},
+    {k:"t14",slot:"Day 3",task:"First Customer Call",action:"Call first customer, gather raw feedback",tool:"Zoom",done:false},
+    {k:"t15",slot:"Day 4-5",task:"Collect Testimonials",action:"Request written/video testimonials",tool:"Tally.so",done:false},
+    {k:"t16",slot:"Day 6",task:"Content Blitz",action:"Post 2x daily, highlight results",tool:"Buffer",done:false},
+    {k:"t17",slot:"Day 7",task:"Revenue Review",action:"Calculate MRR, find top channel",tool:"Stripe",done:false},
   ],
-  phase4:[
-    {key:"p4-0",slot:"Week 2",task:"Scale Top Channel",action:"Post 2x daily on winning channel",tool:"Buffer",status:"pending"},
-    {key:"p4-1",slot:"Week 2-3",task:"Build Email List",action:"Capture emails, 5-email nurture sequence",tool:"Beehiiv",status:"pending"},
-    {key:"p4-2",slot:"Week 3",task:"Raise Prices",action:"Increase price 30-50% on demand signals",tool:"Gumroad/Stripe",status:"pending"},
-    {key:"p4-3",slot:"Week 4",task:"Automate & Delegate",action:"Hire VA, document SOPs in Notion",tool:"Notion+Loom",status:"pending"},
+  p4:[
+    {k:"t18",slot:"Week 2",task:"Scale Top Channel",action:"Post 2x daily on winning channel",tool:"Buffer",done:false},
+    {k:"t19",slot:"Week 2-3",task:"Build Email List",action:"Capture emails, 5-email nurture sequence",tool:"Beehiiv",done:false},
+    {k:"t20",slot:"Week 3",task:"Raise Prices",action:"Increase price 30-50% on demand signals",tool:"Gumroad",done:false},
+    {k:"t21",slot:"Week 4",task:"Automate & Delegate",action:"Hire VA, document SOPs in Notion",tool:"Notion+Loom",done:false},
   ],
 };
 
+const PHASE_META = [
+  {key:"p1",label:"7-Hour Launch",short:"7H",color:"#007AFF"},
+  {key:"p2",label:"24-Hour Distrib",short:"24H",color:"#34D399"},
+  {key:"p3",label:"7-Day Growth",short:"7D",color:"#F59E0B"},
+  {key:"p4",label:"30-Day Scale",short:"30D",color:"#EC4899"},
+];
+
 const QUESTIONS = [
-  {q:"What is your primary skill or expertise?",p:"e.g. Coding, copywriting, video editing, sales..."},
-  {q:"Who do you most want to serve?",p:"e.g. E-commerce brands, SaaS founders, real estate investors..."},
+  {q:"What is your primary skill or expertise?",p:"e.g. Coding, copywriting, video editing..."},
+  {q:"Who do you most want to serve?",p:"e.g. E-commerce brands, SaaS founders..."},
   {q:"What specific result do you deliver?",p:"e.g. Save 10hrs/week, increase revenue 30%..."},
-  {q:"What is your preferred business format?",p:"e.g. Done-for-you service, SaaS, newsletter, course..."},
+  {q:"What is your preferred business format?",p:"e.g. Done-for-you service, SaaS, newsletter..."},
   {q:"What is your revenue goal in 30 days?",p:"e.g. $1,000, $5,000, $10,000..."},
 ];
 
-const SCRIPTS = [
-  {id:"reddit",label:"Reddit Post",icon:"🔴",color:"#FF4500"},
-  {id:"twitter",label:"Twitter Thread",icon:"𝕏",color:"#1D9BF0"},
-  {id:"cold_dm",label:"Cold DM Script",icon:"💬",color:"#007AFF"},
-  {id:"linkedin",label:"LinkedIn Post",icon:"in",color:"#0A66C2"},
-  {id:"email",label:"Launch Email",icon:"✉",color:"#34D399"},
-];
-
 const RESOURCES = [
-  {name:"Looka",url:"https://looka.com",icon:"🎨",desc:"AI Logo"},
-  {name:"Namecheap",url:"https://namecheap.com",icon:"🌐",desc:"Domain"},
-  {name:"Vercel",url:"https://vercel.com",icon:"☁️",desc:"Hosting"},
-  {name:"Gumroad",url:"https://gumroad.com",icon:"💳",desc:"Payments"},
-  {name:"Carrd",url:"https://carrd.co",icon:"📄",desc:"Landing Page"},
-  {name:"Beehiiv",url:"https://beehiiv.com",icon:"📧",desc:"Email List"},
-  {name:"Plausible",url:"https://plausible.io",icon:"📊",desc:"Analytics"},
-  {name:"Canva",url:"https://canva.com",icon:"✏️",desc:"Design"},
-  {name:"Tally",url:"https://tally.so",icon:"📝",desc:"Forms"},
-  {name:"Cal.com",url:"https://cal.com",icon:"📅",desc:"Booking"},
-  {name:"Claude AI",url:"https://claude.ai",icon:"🤖",desc:"AI Writer"},
-  {name:"Descript",url:"https://descript.com",icon:"🎬",desc:"Video Edit"},
-  {name:"Instantly",url:"https://instantly.ai",icon:"📨",desc:"Cold Email"},
-  {name:"Clay",url:"https://clay.com",icon:"🏺",desc:"Lead Data"},
-  {name:"Opus Pro",url:"https://opus.pro",icon:"✂️",desc:"AI Clips"},
-  {name:"Buffer",url:"https://buffer.com",icon:"⏰",desc:"Scheduler"},
+  {n:"Looka",u:"https://looka.com",i:"🎨",d:"AI Logo"},
+  {n:"Namecheap",u:"https://namecheap.com",i:"🌐",d:"Domain"},
+  {n:"Vercel",u:"https://vercel.com",i:"☁️",d:"Hosting"},
+  {n:"Gumroad",u:"https://gumroad.com",i:"💳",d:"Payments"},
+  {n:"Carrd",u:"https://carrd.co",i:"📄",d:"Landing Page"},
+  {n:"Beehiiv",u:"https://beehiiv.com",i:"📧",d:"Email List"},
+  {n:"Canva",u:"https://canva.com",i:"✏️",d:"Design"},
+  {n:"Tally",u:"https://tally.so",i:"📝",d:"Forms"},
+  {n:"Cal.com",u:"https://cal.com",i:"📅",d:"Booking"},
+  {n:"Claude AI",u:"https://claude.ai",i:"🤖",d:"AI Writer"},
+  {n:"Descript",u:"https://descript.com",i:"🎬",d:"Video Edit"},
+  {n:"Instantly",u:"https://instantly.ai",i:"📨",d:"Cold Email"},
+  {n:"Clay",u:"https://clay.com",i:"🏺",d:"Lead Data"},
+  {n:"Opus Pro",u:"https://opus.pro",i:"✂️",d:"AI Clips"},
+  {n:"Buffer",u:"https://buffer.com",i:"⏰",d:"Scheduler"},
+  {n:"Plausible",u:"https://plausible.io",i:"📊",d:"Analytics"},
 ];
 
-const PHASE_META = [
-  {key:"phase1",label:"7-Hour Launch",short:"7H",color:"#007AFF"},
-  {key:"phase2",label:"24-Hour Distribution",short:"24H",color:"#34D399"},
-  {key:"phase3",label:"7-Day Growth",short:"7D",color:"#F59E0B"},
-  {key:"phase4",label:"30-Day Scale",short:"30D",color:"#EC4899"},
-];
+// ── STATE ─────────────────────────────────────────
+const S = {
+  page: "home",      // home | dashboard
+  tab: "launch",
+  idea: null,
+  taskDone: {},
+  launched: false,
+  notes: "# My Launch Notes\n\nCapture ideas, wins, blockers here...\n\n## Today\n- [ ] Complete Hour 1-3\n- [ ] Post on 2 channels\n\n## Wins\n\n## Blockers\n",
+  notesSaved: true,
+  modalOpen: false,
+  drawerTask: null,
+  qaStep: 0,
+  qaAnswers: {},
+  qaIdeas: [],
+  qaLoading: false,
+  scriptActive: null,
+  scriptOuts: {},
+  scriptLoading: {},
+};
 
-const HOUR_ICONS = ["🎯","🔍","💎","🚀","💳","🧲","📡"];
+let notesTimer = null;
 
-// ── GAS CALLS ─────────────────────────────────────────────────
-async function gasPost(body){
-  try{
-    const r = await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    return r.json();
-  }catch(e){return{success:false}}
+function setState(updates) {
+  Object.assign(S, updates);
+  render();
 }
 
-// ── CLAUDE AI CALL ────────────────────────────────────────────
-async function askClaude(prompt, sys="You are an elite business strategist. Be concise and actionable."){
-  try{
-    const r = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:900,system:sys,messages:[{role:"user",content:prompt}]})
+// ── HELPERS ───────────────────────────────────────
+async function gasPost(body) {
+  try {
+    const r = await fetch(GAS, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+    return r.json();
+  } catch(e) { return {success:false}; }
+}
+
+async function askClaude(prompt, sys) {
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model: CLAUDE, max_tokens: 900,
+        system: sys || "You are an elite business strategist. Be concise and actionable.",
+        messages: [{role:"user", content:prompt}]
+      })
     });
     const d = await r.json();
     return d.content?.[0]?.text || "Error generating. Please try again.";
-  }catch(e){return "Connection error. Please try again."}
+  } catch(e) { return "Connection error. Please try again."; }
 }
 
-// ── STATE ─────────────────────────────────────────────────────
-const Ctx = createContext(null);
-const INIT = {
-  phase:"onboarding", tab:"launchpad",
-  selectedIdea:null, top20:[],
-  taskStatuses:{}, taskStarts:{},
-  drawerTask:null, modalOpen:false,
-  launched:false, confetti:false,
-  notes:"# My Launch Notes\n\nCapture ideas, wins, blockers here...\n\n## Today\n- [ ] Complete Hour 1-3\n- [ ] Post on 2 channels\n\n## Wins\n\n## Blockers\n",
-  notesSaved:true,
-};
+function el(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  if (attrs) {
+    Object.entries(attrs).forEach(([k,v]) => {
+      if (k === "class") e.className = v;
+      else if (k === "style" && typeof v === "object") Object.assign(e.style, v);
+      else if (k.startsWith("on")) e.addEventListener(k.slice(2).toLowerCase(), v);
+      else e.setAttribute(k, v);
+    });
+  }
+  children.flat().forEach(c => {
+    if (c === null || c === undefined) return;
+    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  });
+  return e;
+}
 
-function reducer(s,a){
-  switch(a.t){
-    case"PHASE":return{...s,phase:a.v};
-    case"TAB":return{...s,tab:a.v};
-    case"IDEA":return{...s,selectedIdea:a.v,phase:"dashboard",modalOpen:false};
-    case"TOP20":return{...s,top20:a.v};
-    case"DRAWER":return{...s,drawerTask:a.v};
-    case"MODAL":return{...s,modalOpen:a.v};
-    case"LAUNCH":return{...s,launched:true,confetti:true};
-    case"STOP_CF":return{...s,confetti:false};
-    case"NOTES":return{...s,notes:a.v,notesSaved:false};
-    case"NOTES_SAVED":return{...s,notesSaved:true};
-    case"TASK":{
-      const ns={...s.taskStatuses,[a.key]:a.status};
-      const ts={...s.taskStarts};
-      if(a.status==="active")ts[a.key]=Date.now(); else delete ts[a.key];
-      return{...s,taskStatuses:ns,taskStarts:ts};
-    }
-    default:return s;
+function html(str) {
+  const d = document.createElement("div");
+  d.innerHTML = str;
+  return d.firstChild || d;
+}
+
+function countDone(phaseKey) {
+  return (TASKS[phaseKey]||[]).filter(t => S.taskDone[t.k]).length;
+}
+
+function totalDone() {
+  return Object.values(TASKS).flat().filter(t => S.taskDone[t.k]).length;
+}
+
+function totalTasks() {
+  return Object.values(TASKS).flat().length;
+}
+
+function p1Done() { return countDone("p1"); }
+function p1Total() { return TASKS.p1.length; }
+function overallPct() { return totalTasks() > 0 ? Math.round((totalDone()/totalTasks())*100) : 0; }
+
+// ── MINI SVG PIE ──────────────────────────────────
+function makePie(pct, color, size=60) {
+  const r = size/2 - 6;
+  const cx = size/2, cy = size/2;
+  const angle = (pct/100) * 2 * Math.PI;
+  const x1 = cx + r * Math.sin(0);
+  const y1 = cy - r * Math.cos(0);
+  const x2 = cx + r * Math.sin(angle);
+  const y2 = cy - r * Math.cos(angle);
+  const large = angle > Math.PI ? 1 : 0;
+  const innerR = r - 10;
+
+  const pathD = pct >= 99
+    ? `M ${cx} ${cy-r} A ${r} ${r} 0 1 1 ${cx-0.01} ${cy-r} Z M ${cx} ${cy-innerR} A ${innerR} ${innerR} 0 1 0 ${cx-0.01} ${cy-innerR} Z`
+    : pct <= 0
+    ? ""
+    : `M ${cx} ${cy-r} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${cx + innerR*Math.sin(angle)} ${cy - innerR*Math.cos(angle)} A ${innerR} ${innerR} 0 ${large} 0 ${cx} ${cy-innerR} Z`;
+
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+    ${pct > 0 ? `<path d="${pathD}" fill="${color}" opacity="0.9"/>` : ''}
+    <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="-apple-system,sans-serif">${pct}%</text>
+  </svg>`;
+}
+
+// ── CONFETTI ──────────────────────────────────────
+function spawnConfetti() {
+  const colors = ["#007AFF","#34D399","#F59E0B","#EC4899","#A78BFA","#FCD34D"];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const d = document.createElement("div");
+      d.className = "cf-piece";
+      d.style.cssText = `
+        left:${Math.random()*100}vw;
+        width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        border-radius:${Math.random()>.5?"50%":"2px"};
+        z-index:9999;
+        animation-duration:${1.5+Math.random()*2}s;
+        transform:rotate(${Math.random()*360}deg);
+      `;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 4000);
+    }, i * 30);
   }
 }
 
-function AppProvider({children}){
-  const [state,dispatch]=useReducer(reducer,INIT);
-  const notesTimer=useRef(null);
+// ── COMPONENTS ────────────────────────────────────
 
-  useEffect(()=>{
-    if(state.confetti){
-      const t=setTimeout(()=>dispatch({t:"STOP_CF"}),4500);
-      return()=>clearTimeout(t);
-    }
-  },[state.confetti]);
-
-  useEffect(()=>{
-    if(state.notesSaved)return;
-    clearTimeout(notesTimer.current);
-    notesTimer.current=setTimeout(async()=>{
-      await gasPost({action:"saveNotes",notes:state.notes});
-      dispatch({t:"NOTES_SAVED"});
-    },60000);
-    return()=>clearTimeout(notesTimer.current);
-  },[state.notes,state.notesSaved]);
-
-  const allTasks=["phase1","phase2","phase3","phase4"].flatMap(k=>TASKS[k]||[]);
-  const doneCount=Object.values(state.taskStatuses).filter(s=>s==="complete").length;
-  const overallPct=allTasks.length?Math.round((doneCount/allTasks.length)*100):0;
-  const p1Tasks=TASKS.phase1;
-  const p1Done=p1Tasks.filter(t=>state.taskStatuses[t.key]==="complete").length;
-  const hasBottleneck=Object.values(state.taskStarts).some(ts=>(Date.now()-ts)>7200000);
-
-  return(
-    <Ctx.Provider value={{state,dispatch,all:{allTasks,doneCount,overallPct,p1Done,p1Total:p1Tasks.length,hasBottleneck}}}>
-      {children}
-    </Ctx.Provider>
-  );
-}
-
-function useApp(){return useContext(Ctx);}
-
-// ── UI PRIMITIVES ─────────────────────────────────────────────
-function Glass({children,style={},onClick}){
-  return <div onClick={onClick} style={{background:"rgba(255,255,255,0.025)",border:`1px solid ${C.border}`,borderRadius:14,backdropFilter:"blur(20px)",...style}}>{children}</div>;
-}
-function Badge({children,color=C.blue,style={}}){
-  return <span style={{display:"inline-flex",alignItems:"center",padding:"2px 9px",background:`${color}18`,border:`1px solid ${color}40`,borderRadius:5,fontSize:10,fontWeight:700,color,letterSpacing:"0.8px",...style}}>{children}</span>;
-}
-function Btn({children,v="primary",onClick,disabled,style={},size="md"}){
-  const pad=size==="sm"?"8px 14px":size==="lg"?"16px 40px":"11px 22px";
-  const fs=size==="sm"?"12px":size==="lg"?"16px":"13px";
-  const base={border:"none",borderRadius:10,fontWeight:700,cursor:disabled?"not-allowed":"pointer",fontSize:fs,padding:pad,transition:"all 0.15s",opacity:disabled?0.4:1,fontFamily:"inherit",...style};
-  const vs={
-    primary:{background:`linear-gradient(135deg,${C.blue},${C.blueDark})`,color:"#fff",boxShadow:`0 4px 20px ${C.blue}30`},
-    ghost:{background:"rgba(255,255,255,0.05)",color:C.sub,border:`1px solid ${C.border}`},
-    danger:{background:"linear-gradient(135deg,#EF4444,#DC2626)",color:"#fff"},
-    success:{background:`linear-gradient(135deg,${C.green},#059669)`,color:"#fff"},
-    outline:{background:"transparent",color:C.sub,border:`1px solid ${C.border}`},
-  };
-  return <button onClick={onClick} disabled={disabled} style={{...base,...(vs[v]||vs.primary)}}>{children}</button>;
-}
-function Spin({size=32,color=C.blue}){
-  return <div style={{width:size,height:size,border:`3px solid ${color}25`,borderTopColor:color,borderRadius:"50%",animation:"spin 0.7s linear infinite"}}/>;
-}
-
-// ── CONFETTI ──────────────────────────────────────────────────
-function Confetti(){
-  const {state}=useApp();
-  if(!state.confetti)return null;
-  return(
-    <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:9999,overflow:"hidden"}}>
-      {Array.from({length:80},(_,i)=>(
-        <div key={i} style={{position:"absolute",left:`${Math.random()*100}%`,top:"-12px",width:`${5+Math.random()*9}px`,height:`${5+Math.random()*9}px`,background:["#007AFF","#34D399","#F59E0B","#EC4899","#A78BFA","#FCD34D"][i%6],borderRadius:Math.random()>0.5?"50%":"2px",animation:`cfFall ${1.5+Math.random()*2}s ease-in forwards`,animationDelay:`${Math.random()*0.8}s`,transform:`rotate(${Math.random()*360}deg)`}}/>
-      ))}
-    </div>
-  );
-}
-
-// ── ACTION DRAWER ─────────────────────────────────────────────
-function ActionDrawer(){
-  const {state,dispatch}=useApp();
-  const task=state.drawerTask;
-  const idea=state.selectedIdea;
-  const [out,setOut]=useState("");
-  const [loading,setLoading]=useState(false);
-
-  useEffect(()=>{if(task)setOut("");},[task?.key]);
-
-  const PROMPTS={
-    0:(idea)=>`Business: "${idea?.idea_name}". USP: ${idea?.usp}. Write a 6-step market validation plan with specific search terms, 3 subreddits to check, and 3 qualifying questions for prospects.`,
-    1:(idea)=>`Business: "${idea?.idea_name}". Identify 5 competitors I should research, what differentiates me, and how to position to win.`,
-    2:(idea)=>`Business: "${idea?.idea_name}". USP: ${idea?.usp}. Write 3 offer variants: core promise, price, what is included, one-line pitch. Make them feel like no-brainers.`,
-    3:(idea)=>`Business: "${idea?.idea_name}". Write complete landing page copy: hero headline, subheadline, 3 benefit bullets, 3 FAQs, CTA button text. Ready to paste.`,
-    4:(idea)=>`Business: "${idea?.idea_name}". Give exact step-by-step Gumroad setup: product creation, pricing, checkout, handling first refund.`,
-    5:(idea)=>`Business: "${idea?.idea_name}". Write 3 lead magnet ideas with title, format, 50-word description. Then full outline for the best one.`,
-    6:(idea)=>`Business: "${idea?.idea_name}". Write launch day war room plan: what to post first, metrics to check every 30 min, what to do with zero sales in 3 hours.`,
-  };
-
-  const generate=async()=>{
-    setLoading(true);setOut("");
-    const idx=task?.idx||0;
-    const prompt=PROMPTS[idx]?PROMPTS[idx](idea):PROMPTS[0](idea);
-    const result=await askClaude(prompt);
-    setOut(result);setLoading(false);
-  };
-
-  if(!task)return null;
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(10px)",padding:20}} onClick={()=>dispatch({t:"DRAWER",v:null})}>
-      <div onClick={e=>e.stopPropagation()} style={{background:C.surface,border:`1px solid ${C.borderBlue}`,borderRadius:20,width:"100%",maxWidth:660,maxHeight:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:`0 0 60px ${C.blue}20`}}>
-        <div style={{padding:"22px 26px 18px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-          <div>
-            <Badge color={C.blue} style={{marginBottom:6}}>ACTION DRAWER — {task.slot?.toUpperCase()}</Badge>
-            <div style={{fontSize:20,fontWeight:800,color:C.text}}>{task.task} Tool-Kit</div>
-            <div style={{fontSize:12,color:C.muted,marginTop:3}}>{task.action}</div>
-          </div>
-          <button onClick={()=>dispatch({t:"DRAWER",v:null})} style={{background:"rgba(255,255,255,0.06)",border:"none",color:C.sub,borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:14}}>✕</button>
-        </div>
-        <div style={{flex:1,overflow:"auto",padding:"22px 26px"}}>
-          {!out&&!loading&&(
-            <div style={{background:"rgba(0,122,255,0.05)",border:"1px dashed rgba(0,122,255,0.2)",borderRadius:12,padding:40,textAlign:"center"}}>
-              <div style={{fontSize:40,marginBottom:12}}>{task.icon||"⚡"}</div>
-              <div style={{color:C.muted,marginBottom:20,fontSize:13}}>AI generates a custom plan for <strong style={{color:C.blue}}>{idea?.idea_name||"your idea"}</strong></div>
-              <Btn v="primary" onClick={generate}>⚡ Generate Action Plan</Btn>
-            </div>
-          )}
-          {loading&&<div style={{textAlign:"center",padding:"50px 0"}}><div style={{display:"flex",justifyContent:"center",marginBottom:14}}><Spin size={36}/></div><div style={{color:C.blue,fontSize:13}}>Generating your plan...</div></div>}
-          {out&&(
-            <div>
-              <div style={{background:"rgba(255,255,255,0.02)",border:`1px solid ${C.border}`,borderRadius:10,padding:18,fontSize:13,lineHeight:"1.75",color:"#C8C8D0",whiteSpace:"pre-wrap",maxHeight:320,overflow:"auto"}}>{out}</div>
-              <div style={{display:"flex",gap:10,marginTop:14}}>
-                <Btn v="ghost" size="sm" onClick={()=>navigator.clipboard.writeText(out)}>📋 Copy All</Btn>
-                <Btn v="ghost" size="sm" onClick={generate}>🔄 Regenerate</Btn>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── IDEA MODAL ────────────────────────────────────────────────
-function IdeaModal(){
-  const {state,dispatch}=useApp();
-  const [step,setStep]=useState(0);
-  const [ans,setAns]=useState({});
-  const [ideas,setIdeas]=useState([]);
-  const [loading,setLoading]=useState(false);
-
-  const isQ=step<QUESTIONS.length&&!loading;
-  const isLoading=loading;
-  const isResults=!loading&&step===QUESTIONS.length&&ideas.length>0;
-
-  const handleNext=async()=>{
-    if(!ans[step])return;
-    if(step<QUESTIONS.length-1){setStep(s=>s+1);return;}
-    setLoading(true);
-    const profile={skillset:ans[0],audience:ans[1],result:ans[2],format:ans[3],revenue:ans[4]};
-    // Try GAS first, fallback to local ranking
-    try{
-      const data=await gasPost({action:"filterTop20",userProfile:profile});
-      if(data?.top20?.length>0){setIdeas(data.top20);}
-      else throw new Error("No results");
-    }catch{
-      // Local ranking — shuffle with fake scores
-      const ranked=IDEAS.map(i=>({...i,confidence:`${75+Math.floor(Math.random()*24)}%`}))
-        .sort((a,b)=>parseInt(b.confidence)-parseInt(a.confidence));
-      setIdeas(ranked);
-    }
-    setLoading(false);
-    setStep(QUESTIONS.length);
-  };
-
-  const select=(idea)=>{
-    dispatch({t:"IDEA",v:idea});
-    gasPost({action:"populateRoadmap",ideaId:idea.id,userProfile:{skillset:ans[0],revenue:ans[4]}});
-    setStep(0);setAns({});setIdeas([]);
-  };
-
-  if(!state.modalOpen)return null;
-  const DIFF_C={1:C.green,2:C.green,3:C.amber,4:C.red,5:C.red};
-
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(14px)",padding:20}} onClick={()=>dispatch({t:"MODAL",v:false})}>
-      <div onClick={e=>e.stopPropagation()} style={{background:"#0A0A0F",border:`1px solid ${C.borderBlue}`,borderRadius:24,width:"100%",maxWidth:900,maxHeight:"88vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:`0 0 100px ${C.blue}12`}}>
-        <div style={{padding:"24px 30px 20px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-          <div>
-            <Badge color={C.blue} style={{marginBottom:8}}>IDEA ENGINE — 100 PREMIUM AI BUSINESSES</Badge>
-            <div style={{fontSize:22,fontWeight:800,color:C.text}}>Find Your Perfect Business</div>
-          </div>
-          <button onClick={()=>dispatch({t:"MODAL",v:false})} style={{background:"rgba(255,255,255,0.06)",border:"none",color:C.sub,borderRadius:10,width:34,height:34,cursor:"pointer",fontSize:16}}>✕</button>
-        </div>
-        <div style={{flex:1,overflow:"auto",padding:"26px 30px"}}>
-          {isQ&&(
-            <div style={{animation:"fadeUp 0.3s ease"}}>
-              <div style={{display:"flex",gap:6,marginBottom:30}}>
-                {QUESTIONS.map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=step?C.blue:"rgba(255,255,255,0.07)",transition:"background 0.3s"}}/>)}
-              </div>
-              <div style={{fontSize:12,color:C.blue,fontWeight:700,marginBottom:10}}>QUESTION {step+1} OF {QUESTIONS.length}</div>
-              <div style={{fontSize:20,fontWeight:700,color:C.text,marginBottom:24}}>{QUESTIONS[step].q}</div>
-              <input autoFocus value={ans[step]||""} placeholder={QUESTIONS[step].p}
-                onChange={e=>setAns(p=>({...p,[step]:e.target.value}))}
-                onKeyDown={e=>e.key==="Enter"&&handleNext()}
-                style={{width:"100%",background:"rgba(255,255,255,0.04)",border:`1px solid ${C.border}`,borderRadius:12,padding:"16px 20px",fontSize:15,color:C.text,outline:"none",boxSizing:"border-box"}}
-                onFocus={e=>e.target.style.borderColor=C.blue}
-                onBlur={e=>e.target.style.borderColor=C.border}
-              />
-              <div style={{display:"flex",justifyContent:"space-between",marginTop:22}}>
-                <Btn v="outline" onClick={()=>setStep(s=>Math.max(0,s-1))} disabled={step===0}>← Back</Btn>
-                <Btn v="primary" onClick={handleNext} disabled={!ans[step]}>{step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</Btn>
-              </div>
-            </div>
-          )}
-          {isLoading&&(
-            <div style={{textAlign:"center",padding:"70px 0"}}>
-              <div style={{display:"flex",justifyContent:"center",marginBottom:18}}><Spin size={52}/></div>
-              <div style={{fontSize:20,fontWeight:700,color:C.text,marginBottom:8}}>Analyzing Your Profile...</div>
-              <div style={{color:C.muted,fontSize:13}}>Scanning 100 premium ideas · Calculating confidence scores</div>
-            </div>
-          )}
-          {isResults&&(
-            <div style={{animation:"fadeUp 0.3s ease"}}>
-              <div style={{fontSize:12,color:C.green,fontWeight:700,marginBottom:18}}>✨ {ideas.length} ideas matched to your profile — ranked by confidence</div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:12}}>
-                {ideas.map((idea,i)=>{
-                  const conf=parseInt(idea.confidence)||80;
-                  const diff=parseInt(idea.difficulty)||3;
-                  return(
-                    <div key={idea.id||i} style={{background:"rgba(255,255,255,0.025)",border:`1px solid ${C.border}`,borderRadius:14,padding:18,cursor:"pointer",transition:"all 0.2s"}}
-                      onMouseEnter={e=>{e.currentTarget.style.border=`1px solid ${C.borderBlue}`;e.currentTarget.style.background="rgba(0,122,255,0.05)";}}
-                      onMouseLeave={e=>{e.currentTarget.style.border=`1px solid ${C.border}`;e.currentTarget.style.background="rgba(255,255,255,0.025)";}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
-                        <Badge color={C.blue} style={{fontSize:9}}>{(idea.category||"AI").split(" ")[0]}</Badge>
-                        <span style={{fontSize:14,fontWeight:800,color:C.green}}>{conf}%</span>
-                      </div>
-                      <div style={{fontSize:13,fontWeight:700,color:C.text,marginBottom:5,lineHeight:1.3}}>{idea.idea_name}</div>
-                      <div style={{fontSize:11,color:C.muted,marginBottom:12,lineHeight:1.5}}>{idea.usp}</div>
-                      <div style={{display:"flex",flexDirection:"column",gap:5,marginBottom:14}}>
-                        <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:10,color:C.muted}}>Revenue</span><span style={{fontSize:10,color:C.green,fontWeight:700}}>$1K–$10K/mo</span></div>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontSize:10,color:C.muted}}>Difficulty</span><div style={{display:"flex",gap:2}}>{[1,2,3,4,5].map(d=><div key={d} style={{width:7,height:7,borderRadius:2,background:d<=diff?DIFF_C[diff]:"rgba(255,255,255,0.1)"}}/>)}</div></div>
-                        <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:10,color:C.muted}}>Launch Speed</span><span style={{fontSize:10,color:C.amber,fontWeight:700}}>7 hours</span></div>
-                      </div>
-                      <Btn v="primary" size="sm" style={{width:"100%"}} onClick={()=>select(idea)}>🚀 Start Execution</Btn>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── SIDEBAR ───────────────────────────────────────────────────
-function Sidebar(){
-  const {state,dispatch,all}=useApp();
-  const TABS=[
-    {id:"launchpad",icon:"⚡",label:"Launch Pad"},
+function renderSidebar() {
+  const tabs = [
+    {id:"launch",icon:"⚡",label:"Launch Pad"},
     {id:"scripts",icon:"📡",label:"Script Vault"},
     {id:"roadmap",icon:"🗺",label:"Roadmap"},
     {id:"notes",icon:"📝",label:"Notes"},
     {id:"resources",icon:"🔗",label:"Resources"},
   ];
-  return(
-    <div style={{width:210,flexShrink:0,background:C.surface,borderRight:`1px solid ${C.border}`,display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
-      <div style={{padding:"20px 18px 16px",borderBottom:`1px solid ${C.border}`}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:state.selectedIdea?14:0}}>
-          <div style={{width:30,height:30,background:`linear-gradient(135deg,${C.blue},${C.blueDark})`,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15}}>⚡</div>
-          <div>
-            <div style={{fontSize:13,fontWeight:800,color:C.text}}>Execution OS</div>
-            <div style={{fontSize:9,color:C.muted}}>v2.0 PRO</div>
+
+  const sb = el("div", {class:"sidebar"});
+
+  // Logo
+  const logo = el("div", {style:{padding:"20px 16px 16px",borderBottom:"1px solid rgba(255,255,255,.07)"}});
+  logo.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:${S.idea?14:0}px">
+      <div style="width:30px;height:30px;background:linear-gradient(135deg,#007AFF,#0055FF);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px">⚡</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#F0F0F5">Execution OS</div>
+        <div style="font-size:9px;color:#4A4A5A">v2.0 PRO</div>
+      </div>
+    </div>
+    ${S.idea ? `<div style="background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.2);border-radius:8px;padding:7px 10px">
+      <div style="font-size:9px;color:#007AFF;font-weight:700;letter-spacing:1.5px;margin-bottom:2px">ACTIVE IDEA</div>
+      <div style="font-size:11px;color:#F0F0F5;font-weight:600;line-height:1.3">${S.idea.name}</div>
+    </div>` : ""}
+  `;
+  sb.appendChild(logo);
+
+  // Nav
+  const nav = el("nav", {style:{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}});
+  tabs.forEach(t => {
+    const b = el("button", {
+      class: "nav-btn" + (S.tab===t.id?" active":""),
+      onClick: () => setState({tab:t.id})
+    });
+    b.innerHTML = `<span style="font-size:14px;width:17px;text-align:center">${t.icon}</span> ${t.label} ${S.tab===t.id?'<span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:#007AFF;display:inline-block"></span>':""}`;
+    nav.appendChild(b);
+  });
+  sb.appendChild(nav);
+
+  // Progress
+  const prog = el("div", {style:{padding:"14px 16px",borderTop:"1px solid rgba(255,255,255,.07)"}});
+  prog.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:11px;color:#4A4A5A">Progress</span>
+      <span style="font-size:11px;font-weight:700;color:#007AFF">${overallPct()}%</span>
+    </div>
+    <div class="prog-wrap" style="margin-bottom:8px">
+      <div class="prog-bar" style="width:${overallPct()}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <div style="width:6px;height:6px;border-radius:50%;background:#34D399"></div>
+      <span style="font-size:9px;color:#4A4A5A">GAS Connected</span>
+    </div>
+  `;
+  sb.appendChild(prog);
+  return sb;
+}
+
+function renderTopbar() {
+  const tb = el("div", {class:"topbar"});
+  tb.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:#4A4A5A">${S.idea ? S.idea.name : "No idea selected"}</span>
+      ${S.idea ? '<span class="badge" style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399">ACTIVE</span>' : ""}
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="text-align:center">
+        <div style="font-size:17px;font-weight:800;color:#007AFF;line-height:1">${p1Done()}/${p1Total()}</div>
+        <div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">HOURS</div>
+      </div>
+      <div style="width:1px;height:22px;background:rgba(255,255,255,.07)"></div>
+      <div style="text-align:center">
+        <div style="font-size:17px;font-weight:800;color:#34D399;line-height:1">${overallPct()}%</div>
+        <div style="font-size:9px;color:#4A4A5A;letter-spacing:1px">DONE</div>
+      </div>
+      <div style="width:1px;height:22px;background:rgba(255,255,255,.07)"></div>
+    </div>
+  `;
+  const btn = el("button", {class:"btn btn-primary btn-sm", onClick:()=>setState({modalOpen:true})});
+  btn.textContent = "✨ Find Idea";
+  tb.appendChild(btn);
+  return tb;
+}
+
+// ── LAUNCHPAD ──────────────────────────────────────
+function renderLaunch() {
+  const wrap = el("div", {style:{maxWidth:"820px",margin:"0 auto"}});
+  wrap.innerHTML = `
+    <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">7-Hour Launch Pad</h1>
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">Every task has an AI-powered Tool-Kit. Click ⚡ to open it.</p>
+    <div class="glass" style="padding:12px 16px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+        <span style="font-size:12px;color:#4A4A5A">Phase 1 Progress</span>
+        <span style="font-size:12px;font-weight:700;color:#007AFF">${p1Done()} / ${p1Total()} hours</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${p1Total()>0?(p1Done()/p1Total()*100):0}%;background:linear-gradient(90deg,#007AFF,#34D399)"></div></div>
+    </div>
+  `;
+
+  const icons = ["🎯","🔍","💎","🚀","💳","🧲","📡"];
+  const list = el("div", {style:{display:"flex",flexDirection:"column",gap:10}});
+
+  TASKS.p1.forEach((task, i) => {
+    const isDone = !!S.taskDone[task.k];
+    const prevDone = i === 0 || !!S.taskDone[TASKS.p1[i-1]?.k];
+    const isActive = !isDone && prevDone;
+
+    const card = el("div", {
+      class: "glass task-card" + (isActive?" active-card":""),
+      style: {
+        border: isDone ? "1px solid rgba(52,211,153,.3)" : isActive ? "1px solid rgba(0,122,255,.35)" : "1px solid rgba(255,255,255,.07)"
+      }
+    });
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="check-circle" data-key="${task.k}" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;cursor:pointer;
+          background:${isDone?"rgba(52,211,153,.12)":"rgba(255,255,255,.04)"};
+          border:2px solid ${isDone?"#34D399":isActive?"#007AFF":"rgba(255,255,255,.1)"};
+          display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s">
+          ${isDone?"✓":icons[i]}
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <span style="font-size:10px;color:${isActive?"#007AFF":"#4A4A5A"};font-weight:700;letter-spacing:1.5px">${task.slot.toUpperCase()}</span>
+            ${isActive?'<span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF">NOW</span>':""}
+            ${isDone?'<span class="badge" style="background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34D399">DONE</span>':""}
           </div>
+          <div style="font-size:14px;font-weight:700;color:${isDone?"#555":"#F0F0F5"};margin-bottom:2px">${task.task}</div>
+          <div style="font-size:12px;color:#4A4A5A">${task.action}</div>
         </div>
-        {state.selectedIdea&&(
-          <div style={{background:"rgba(0,122,255,0.08)",border:"1px solid rgba(0,122,255,0.2)",borderRadius:8,padding:"7px 10px"}}>
-            <div style={{fontSize:9,color:C.blue,fontWeight:700,letterSpacing:"1.5px",marginBottom:2}}>ACTIVE IDEA</div>
-            <div style={{fontSize:11,color:C.text,fontWeight:600,lineHeight:1.3}}>{state.selectedIdea.idea_name}</div>
-          </div>
-        )}
-      </div>
-      <nav style={{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}}>
-        {TABS.map(tab=>{
-          const active=state.tab===tab.id;
-          return(
-            <button key={tab.id} onClick={()=>dispatch({t:"TAB",v:tab.id})} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 11px",borderRadius:8,border:"none",cursor:"pointer",background:active?"rgba(0,122,255,0.12)":"transparent",color:active?C.blue:C.sub,fontWeight:active?700:500,fontSize:13,transition:"all 0.15s",textAlign:"left"}}>
-              <span style={{fontSize:14,width:17,textAlign:"center"}}>{tab.icon}</span>
-              {tab.label}
-              {active&&<div style={{marginLeft:"auto",width:5,height:5,borderRadius:"50%",background:C.blue}}/>}
-            </button>
-          );
-        })}
-      </nav>
-      <div style={{padding:"14px 16px",borderTop:`1px solid ${C.border}`}}>
-        <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-          <span style={{fontSize:11,color:C.muted}}>Progress</span>
-          <span style={{fontSize:11,fontWeight:700,color:C.blue}}>{all.overallPct}%</span>
-        </div>
-        <div style={{height:4,background:"rgba(255,255,255,0.05)",borderRadius:2,overflow:"hidden",marginBottom:8}}>
-          <div style={{height:"100%",width:`${all.overallPct}%`,background:`linear-gradient(90deg,${C.blue},${C.green})`,borderRadius:2,transition:"width 0.5s ease"}}/>
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:5}}>
-          <div style={{width:6,height:6,borderRadius:"50%",background:C.green}}/>
-          <span style={{fontSize:9,color:C.muted}}>GAS Connected</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="font-size:11px;color:#4A4A5A;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:4px 9px;white-space:nowrap">${task.tool}</div>
+          <button class="btn btn-sm toolkit-btn" data-idx="${i}" data-key="${task.k}" style="background:${isActive?"linear-gradient(135deg,#007AFF,#0055FF)":"rgba(255,255,255,.05)"};color:${isActive?"#fff":"#9191A4"};border:${isActive?"none":"1px solid rgba(255,255,255,.07)"}">⚡ Tool-Kit</button>
         </div>
       </div>
-    </div>
-  );
+    `;
+    list.appendChild(card);
+  });
+
+  wrap.appendChild(list);
+
+  // Nuclear button
+  const nuc = el("div", {style:{marginTop:40,textAlign:"center"}});
+  if (!S.launched) {
+    nuc.innerHTML = `
+      <div style="font-size:12px;color:#4A4A5A;margin-bottom:14px">Complete all 7 hours to unlock the 30-day scaling plan</div>
+      <button id="nuclear-btn" class="btn btn-lg" style="background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;animation:nuclearPulse 2s ease-in-out infinite;letter-spacing:1.5px">☢ LAUNCH NOW</button>
+    `;
+  } else {
+    nuc.innerHTML = `
+      <div class="glass" style="padding:26px;border:1px solid rgba(52,211,153,.3);max-width:460px;margin:0 auto;background:rgba(52,211,153,.04)">
+        <div style="font-size:34px;margin-bottom:8px">🎉</div>
+        <div style="font-size:22px;font-weight:800;color:#34D399;margin-bottom:6px">YOU ARE LIVE!</div>
+        <div style="color:#4A4A5A;font-size:13px;margin-bottom:18px">30-Day Scaling Plan unlocked in Roadmap tab</div>
+        <button class="btn btn-success" id="go-roadmap">View 30-Day Plan →</button>
+      </div>
+    `;
+  }
+  wrap.appendChild(nuc);
+  return wrap;
 }
 
-// ── TOP BAR ───────────────────────────────────────────────────
-function TopBar(){
-  const {state,dispatch,all}=useApp();
-  return(
-    <div style={{height:54,background:"rgba(10,10,11,0.94)",backdropFilter:"blur(20px)",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 22px",position:"sticky",top:0,zIndex:50,flexShrink:0}}>
-      <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <span style={{fontSize:13,color:C.muted}}>{state.selectedIdea?state.selectedIdea.idea_name:"No idea selected"}</span>
-        {state.selectedIdea&&<Badge color={C.green}>ACTIVE</Badge>}
-        {all.hasBottleneck&&<Badge color={C.red}>⚠ BOTTLENECK</Badge>}
+// ── SCRIPTS TAB ───────────────────────────────────
+function renderScripts() {
+  const wrap = el("div", {style:{maxWidth:"900px",margin:"0 auto"}});
+
+  if (!S.idea) {
+    wrap.innerHTML = `
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:20px">Script Vault</h1>
+      <div class="glass" style="padding:60px;text-align:center">
+        <div style="font-size:44px;margin-bottom:14px">💡</div>
+        <div style="color:#4A4A5A">Select an idea first to generate personalized scripts</div>
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:18}}>
-        <div style={{textAlign:"center"}}>
-          <div style={{fontSize:17,fontWeight:800,color:C.blue,lineHeight:1}}>{all.p1Done}/{all.p1Total}</div>
-          <div style={{fontSize:9,color:C.muted,letterSpacing:"1px"}}>HOURS</div>
-        </div>
-        <div style={{width:1,height:22,background:C.border}}/>
-        <div style={{textAlign:"center"}}>
-          <div style={{fontSize:17,fontWeight:800,color:C.green,lineHeight:1}}>{all.overallPct}%</div>
-          <div style={{fontSize:9,color:C.muted,letterSpacing:"1px"}}>DONE</div>
-        </div>
-        <div style={{width:1,height:22,background:C.border}}/>
-        <Btn v="primary" size="sm" onClick={()=>dispatch({t:"MODAL",v:true})}>✨ Find Idea</Btn>
-      </div>
-    </div>
-  );
-}
+    `;
+    return wrap;
+  }
 
-// ── LAUNCHPAD TAB ─────────────────────────────────────────────
-function LaunchpadTab(){
-  const {state,dispatch,all}=useApp();
-  const tasks=TASKS.phase1.map((t,i)=>({...t,idx:i,icon:HOUR_ICONS[i]}));
+  wrap.innerHTML = `
+    <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Script Vault</h1>
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:20px">AI scripts for <strong style="color:#007AFF">${S.idea.name}</strong> — click, copy, paste, post.</p>
+  `;
 
-  return(
-    <div style={{maxWidth:820,margin:"0 auto",padding:"26px 22px"}}>
-      <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 6px",color:C.text}}>7-Hour Launch Pad</h1>
-      <p style={{color:C.muted,fontSize:13,marginBottom:22}}>Complete each hour in sequence. Every task has an AI-powered Tool-Kit.</p>
-
-      <Glass style={{padding:"12px 16px",marginBottom:18}}>
-        <div style={{display:"flex",justifyContent:"space-between",marginBottom:7}}>
-          <span style={{fontSize:12,color:C.muted}}>Phase 1 Progress</span>
-          <span style={{fontSize:12,fontWeight:700,color:C.blue}}>{all.p1Done} / {all.p1Total} hours</span>
-        </div>
-        <div style={{height:5,background:"rgba(255,255,255,0.05)",borderRadius:3,overflow:"hidden"}}>
-          <div style={{height:"100%",width:`${all.p1Total>0?(all.p1Done/all.p1Total)*100:0}%`,background:`linear-gradient(90deg,${C.blue},${C.green})`,borderRadius:3,transition:"width 0.4s ease"}}/>
-        </div>
-      </Glass>
-
-      <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {tasks.map((task,i)=>{
-          const status=state.taskStatuses[task.key]||task.status||"pending";
-          const isDone=status==="complete";
-          const prevDone=i===0||(state.taskStatuses[tasks[i-1]?.key]||tasks[i-1]?.status)==="complete";
-          const isActive=!isDone&&prevDone;
-          return(
-            <Glass key={task.key} style={{padding:"16px 20px",border:`1px solid ${isDone?"rgba(52,211,153,0.3)":isActive?C.borderBlue:C.border}`,transition:"all 0.3s",animation:isActive?"glow 3s ease-in-out infinite":undefined}}>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div onClick={()=>dispatch({t:"TASK",key:task.key,status:isDone?"pending":"complete"})} style={{width:36,height:36,borderRadius:"50%",flexShrink:0,cursor:"pointer",background:isDone?"rgba(52,211,153,0.12)":"rgba(255,255,255,0.04)",border:`2px solid ${isDone?C.green:isActive?C.blue:"rgba(255,255,255,0.1)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:isDone?16:15,transition:"all 0.2s"}}>
-                  {isDone?"✓":task.icon}
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
-                    <span style={{fontSize:10,color:isActive?C.blue:C.muted,fontWeight:700,letterSpacing:"1.5px"}}>{task.slot?.toUpperCase()}</span>
-                    {isActive&&<Badge color={C.blue}>NOW</Badge>}
-                    {isDone&&<Badge color={C.green}>DONE</Badge>}
-                  </div>
-                  <div style={{fontSize:14,fontWeight:700,color:isDone?"#666":C.text,marginBottom:2}}>{task.task}</div>
-                  <div style={{fontSize:12,color:C.muted}}>{task.action}</div>
-                </div>
-                <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-                  <div style={{fontSize:11,color:C.muted,background:"rgba(255,255,255,0.03)",border:`1px solid ${C.border}`,borderRadius:6,padding:"4px 9px",whiteSpace:"nowrap"}}>{task.tool}</div>
-                  <Btn v={isActive?"primary":"ghost"} size="sm" onClick={()=>dispatch({t:"DRAWER",v:task})}>⚡ Tool-Kit</Btn>
-                </div>
-              </div>
-            </Glass>
-          );
-        })}
-      </div>
-
-      <div style={{marginTop:40,textAlign:"center"}}>
-        {!state.launched?(
-          <>
-            <div style={{fontSize:12,color:C.muted,marginBottom:14}}>Complete all 7 hours to unlock the 30-day scaling plan</div>
-            <button onClick={()=>dispatch({t:"LAUNCH"})} style={{background:"linear-gradient(135deg,#EF4444,#DC2626)",border:"none",color:"#fff",padding:"17px 50px",borderRadius:14,fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:"1.5px",animation:"nuclearPulse 2s ease-in-out infinite"}}>
-              ☢ LAUNCH NOW
-            </button>
-          </>
-        ):(
-          <Glass style={{padding:26,border:"1px solid rgba(52,211,153,0.3)",maxWidth:480,margin:"0 auto",background:"rgba(52,211,153,0.04)"}}>
-            <div style={{fontSize:34,marginBottom:8}}>🎉</div>
-            <div style={{fontSize:22,fontWeight:800,color:C.green,marginBottom:6}}>YOU ARE LIVE!</div>
-            <div style={{color:C.muted,fontSize:13,marginBottom:18}}>30-Day Scaling Plan unlocked in Roadmap tab</div>
-            <Btn v="success" onClick={()=>dispatch({t:"TAB",v:"roadmap"})}>View 30-Day Plan →</Btn>
-          </Glass>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── SCRIPTS TAB ───────────────────────────────────────────────
-function ScriptsTab(){
-  const {state}=useApp();
-  const idea=state.selectedIdea;
-  const [active,setActive]=useState(null);
-  const [outs,setOuts]=useState({});
-  const [loading,setLoading]=useState({});
-  const [copied,setCopied]=useState({});
-
-  const COPY_PROMPTS={
-    reddit:(i)=>`Write a Reddit launch post for: "${i.idea_name}". USP: ${i.usp}. Story-first, reveal product at end. Include Reddit-formatted title and 300-word body.`,
-    twitter:(i)=>`Write an 8-tweet viral thread for: "${i.idea_name}". USP: ${i.usp}. Tweet 1 is a scroll-stopper. Number each "1/" style.`,
-    cold_dm:(i)=>`Write 3 cold DM versions for: "${i.idea_name}". USP: ${i.usp}. Short (50 words), Medium (100 words), Story-based (200 words). Human tone, not salesy.`,
-    linkedin:(i)=>`Write a LinkedIn launch post for: "${i.idea_name}". USP: ${i.usp}. Hook, problem, solution, social proof, CTA in comments. LinkedIn algorithm optimized.`,
-    email:(i)=>`Write a launch email for: "${i.idea_name}". USP: ${i.usp}. Include: Subject (2 variants), preview text, full body with hook/story/offer/urgency/CTA, PS line.`,
-  };
-
-  const handleClick=async(st)=>{
-    setActive(st.id);
-    if(outs[st.id]||!idea)return;
-    setLoading(p=>({...p,[st.id]:true}));
-    const copy=await askClaude(COPY_PROMPTS[st.id](idea),"You are an elite direct-response copywriter. Be specific and conversion-focused.");
-    setOuts(p=>({...p,[st.id]:copy}));
-    setLoading(p=>({...p,[st.id]:false}));
-  };
-
-  const handleCopy=(id)=>{
-    navigator.clipboard.writeText(outs[id]||"");
-    setCopied(p=>({...p,[id]:true}));
-    setTimeout(()=>setCopied(p=>({...p,[id]:false})),2000);
-  };
-
-  if(!idea)return(
-    <div style={{maxWidth:820,margin:"0 auto",padding:"26px 22px"}}>
-      <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 6px",color:C.text}}>Script Vault</h1>
-      <Glass style={{padding:60,textAlign:"center",marginTop:20}}>
-        <div style={{fontSize:44,marginBottom:14}}>💡</div>
-        <div style={{color:C.muted}}>Select an idea first to generate personalized scripts</div>
-      </Glass>
-    </div>
-  );
-
-  return(
-    <div style={{maxWidth:900,margin:"0 auto",padding:"26px 22px"}}>
-      <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 6px",color:C.text}}>24-Hour Script Vault</h1>
-      <p style={{color:C.muted,fontSize:13,marginBottom:22}}>AI scripts for <strong style={{color:C.blue}}>{idea.idea_name}</strong> — click, copy, paste, post.</p>
-
-      <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}}>
-        {SCRIPTS.map(st=>(
-          <button key={st.id} onClick={()=>handleClick(st)} style={{background:active===st.id?`${st.color}18`:"rgba(255,255,255,0.03)",border:`1px solid ${active===st.id?st.color:C.border}`,color:active===st.id?st.color:C.sub,padding:"9px 16px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:7,transition:"all 0.2s"}}>
-            <span>{st.icon}</span>{st.label}
-            {loading[st.id]&&<span style={{width:11,height:11,border:`2px solid ${st.color}30`,borderTopColor:st.color,borderRadius:"50%",animation:"spin 0.7s linear infinite",display:"inline-block"}}/>}
-          </button>
-        ))}
-      </div>
-
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:20}}>
-        <Glass style={{padding:16}}>
-          <Badge color={C.blue} style={{marginBottom:8}}>MASTER_DB SCRIPTS</Badge>
-          <pre style={{fontSize:12,lineHeight:"1.7",color:"#B0B0C0",whiteSpace:"pre-wrap",margin:"0 0 10px",maxHeight:160,overflow:"auto"}}>{idea.marketing_script}</pre>
-          <Btn v="ghost" size="sm" onClick={()=>navigator.clipboard.writeText(idea.marketing_script)}>📋 Copy</Btn>
-        </Glass>
-        <Glass style={{padding:16}}>
-          <Badge color={C.amber} style={{marginBottom:8}}>SCALING ROADMAP</Badge>
-          <pre style={{fontSize:12,lineHeight:"1.7",color:"#B0B0C0",whiteSpace:"pre-wrap",margin:"0 0 10px",maxHeight:160,overflow:"auto"}}>{idea.scaling_roadmap}</pre>
-          <Btn v="ghost" size="sm" onClick={()=>navigator.clipboard.writeText(idea.scaling_roadmap)}>📋 Copy</Btn>
-        </Glass>
-      </div>
-
-      {active&&(
-        <Glass style={{padding:18}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-            <Badge color={C.blue}>AI GENERATED — {active.toUpperCase().replace("_"," ")}</Badge>
-            {outs[active]&&<div style={{display:"flex",gap:8}}>
-              <Btn v="ghost" size="sm" onClick={()=>handleCopy(active)}>{copied[active]?"✓ Copied!":"📋 Copy All"}</Btn>
-              <Btn v="ghost" size="sm" onClick={()=>{setOuts(p=>({...p,[active]:null}));handleClick(SCRIPTS.find(s=>s.id===active));}}>🔄</Btn>
-            </div>}
-          </div>
-          {loading[active]?<div style={{textAlign:"center",padding:"30px 0"}}><div style={{display:"flex",justifyContent:"center",marginBottom:10}}><Spin/></div><div style={{color:C.blue,fontSize:12}}>Writing your script...</div></div>
-          :outs[active]?<pre style={{fontSize:13,lineHeight:"1.75",color:"#C8C8D0",whiteSpace:"pre-wrap",margin:0,maxHeight:320,overflow:"auto"}}>{outs[active]}</pre>:null}
-        </Glass>
-      )}
-    </div>
-  );
-}
-
-// ── ROADMAP TAB ───────────────────────────────────────────────
-function RoadmapTab(){
-  const {state,dispatch,all}=useApp();
-
-  const phaseDone=(key)=>(TASKS[key]||[]).filter(t=>state.taskStatuses[t.key]==="complete").length;
-
-  const pie1=[
-    {name:"Done",value:all.p1Done||0,color:C.blue},
-    {name:"Left",value:Math.max(0,all.p1Total-(all.p1Done||0)),color:"rgba(255,255,255,0.05)"},
+  // Channel buttons
+  const btns = el("div", {style:{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}});
+  const SCRIPT_TYPES = [
+    {id:"reddit",label:"Reddit Post",icon:"🔴",color:"#FF4500"},
+    {id:"twitter",label:"Twitter Thread",icon:"𝕏",color:"#1D9BF0"},
+    {id:"cold_dm",label:"Cold DM",icon:"💬",color:"#007AFF"},
+    {id:"linkedin",label:"LinkedIn",icon:"in",color:"#0A66C2"},
+    {id:"email",label:"Launch Email",icon:"✉",color:"#34D399"},
   ];
-  const pie30=PHASE_META.map(p=>({name:p.short,value:Math.max(phaseDone(p.key),0.5),color:p.color}));
+  SCRIPT_TYPES.forEach(st => {
+    const active = S.scriptActive === st.id;
+    const b = el("button", {
+      class:"btn btn-sm script-type-btn",
+      "data-type": st.id,
+      style: {
+        background: active ? `${st.color}18` : "rgba(255,255,255,.03)",
+        border: `1px solid ${active ? st.color : "rgba(255,255,255,.07)"}`,
+        color: active ? st.color : "#9191A4",
+        display:"flex",alignItems:"center",gap:7,
+      }
+    });
+    b.innerHTML = `${st.icon} ${st.label} ${S.scriptLoading[st.id]?'<span style="width:11px;height:11px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>':""}`;
+    btns.appendChild(b);
+  });
+  wrap.appendChild(btns);
 
-  return(
-    <div style={{maxWidth:1100,margin:"0 auto",padding:"26px 22px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:22,flexWrap:"wrap",gap:14}}>
+  // Static scripts from idea data
+  const staticGrid = el("div", {class:"grid2", style:{marginBottom:20}});
+  staticGrid.innerHTML = `
+    <div class="glass" style="padding:16px">
+      <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:8px">MASTER_DB SCRIPTS</span>
+      <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;max-height:160px;overflow:auto;margin:0 0 10px">${S.idea.scripts}</pre>
+      <button class="btn btn-ghost btn-sm copy-static-scripts">📋 Copy</button>
+    </div>
+    <div class="glass" style="padding:16px">
+      <span class="badge" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#F59E0B;margin-bottom:8px">SCALING ROADMAP</span>
+      <pre style="font-size:12px;line-height:1.7;color:#B0B0C0;max-height:160px;overflow:auto;margin:0 0 10px">${S.idea.scale}</pre>
+      <button class="btn btn-ghost btn-sm copy-static-scale">📋 Copy</button>
+    </div>
+  `;
+  wrap.appendChild(staticGrid);
+
+  // AI output area
+  if (S.scriptActive) {
+    const outBox = el("div", {class:"glass", style:{padding:18}});
+    const isLoading = S.scriptLoading[S.scriptActive];
+    const output = S.scriptOuts[S.scriptActive];
+    outBox.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF">AI GENERATED — ${S.scriptActive.toUpperCase().replace("_"," ")}</span>
+        <div style="display:flex;gap:8px">
+          ${output?`<button class="btn btn-ghost btn-sm copy-ai-output" data-text="${encodeURIComponent(output)}">📋 Copy All</button><button class="btn btn-ghost btn-sm regen-script" data-type="${S.scriptActive}">🔄</button>`:""}
+        </div>
+      </div>
+      ${isLoading ? `<div style="text-align:center;padding:30px">
+        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 12px"></div>
+        <div style="color:#007AFF;font-size:12px">Writing your script...</div>
+      </div>` : output ? `<pre style="font-size:13px;line-height:1.75;color:#C8C8D0;max-height:320px;overflow:auto">${output}</pre>` : ""}
+    `;
+    wrap.appendChild(outBox);
+  }
+
+  return wrap;
+}
+
+// ── ROADMAP TAB ───────────────────────────────────
+function renderRoadmap() {
+  const wrap = el("div", {style:{maxWidth:"1100px",margin:"0 auto"}});
+
+  // Header + pies
+  const hdr = el("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:22,flexWrap:"wrap",gap:14}});
+  hdr.innerHTML = `
+    <div>
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">30-Day Execution Roadmap</h1>
+      <p style="color:#4A4A5A;font-size:13px">Tick tasks to track progress. Bottleneck alerts fire automatically.</p>
+    </div>
+    <div style="display:flex;gap:12px">
+      <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">
+        ${makePie(p1Total()>0?Math.round(p1Done()/p1Total()*100):0,"#007AFF",62)}
         <div>
-          <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 6px",color:C.text}}>30-Day Execution Roadmap</h1>
-          <p style={{color:C.muted,fontSize:13,margin:0}}>Tick tasks as you complete them. Bottleneck alerts fire automatically.</p>
-        </div>
-        <div style={{display:"flex",gap:12}}>
-          {[{data:pie1,label:"TODAY'S GOAL",val:`${all.p1Total?Math.round((all.p1Done/all.p1Total)*100):0}%`,sub:`${all.p1Done}/${all.p1Total} hrs`,color:C.blue},
-            {data:pie30,label:"30-DAY SCALE",val:`${all.overallPct}%`,sub:`${all.doneCount}/${all.allTasks.length}`,color:C.green}
-          ].map((chart,ci)=>(
-            <Glass key={ci} style={{padding:"13px 16px",display:"flex",alignItems:"center",gap:11}}>
-              <div style={{width:62,height:62}}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={chart.data} cx="50%" cy="50%" innerRadius={17} outerRadius={29} dataKey="value" paddingAngle={2}>
-                      {chart.data.map((e,i)=><Cell key={i} fill={e.color}/>)}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div>
-                <div style={{fontSize:9,color:C.muted,marginBottom:2}}>{chart.label}</div>
-                <div style={{fontSize:19,fontWeight:800,color:chart.color}}>{chart.val}</div>
-                <div style={{fontSize:11,color:C.sub}}>{chart.sub}</div>
-              </div>
-            </Glass>
-          ))}
+          <div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">TODAY'S GOAL</div>
+          <div style="font-size:11px;color:#9191A4">${p1Done()}/${p1Total()} hrs</div>
         </div>
       </div>
-
-      <Glass style={{padding:"12px 18px",marginBottom:18}}>
-        <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-          <span style={{fontSize:12,color:C.muted}}>Overall Progress</span>
-          <span style={{fontSize:12,fontWeight:700,color:C.blue}}>{all.doneCount} / {all.allTasks.length} tasks</span>
-        </div>
-        <div style={{height:5,background:"rgba(255,255,255,0.04)",borderRadius:3,overflow:"hidden"}}>
-          <div style={{height:"100%",width:`${all.overallPct}%`,background:`linear-gradient(90deg,${C.blue},${C.green},${C.amber})`,borderRadius:3,transition:"width 0.5s ease"}}/>
-        </div>
-      </Glass>
-
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:14}}>
-        {PHASE_META.map(ph=>{
-          const phaseTasks=TASKS[ph.key]||[];
-          const done=phaseDone(ph.key);
-          const pct=phaseTasks.length?Math.round((done/phaseTasks.length)*100):0;
-          const isBottleneck=all.hasBottleneck&&ph.key==="phase1";
-          return(
-            <Glass key={ph.key} style={{padding:18,border:`1px solid ${isBottleneck?"rgba(239,68,68,0.3)":C.border}`,position:"relative",overflow:"hidden"}}>
-              {isBottleneck&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"linear-gradient(90deg,#EF4444,#F97316)",animation:"pulse 1.5s ease-in-out infinite"}}/>}
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
-                <div>
-                  <Badge color={ph.color} style={{marginBottom:5}}>{ph.short}</Badge>
-                  <div style={{fontSize:14,fontWeight:700,color:C.text}}>{ph.label}</div>
-                </div>
-                <div style={{textAlign:"right"}}>
-                  {isBottleneck&&<div style={{fontSize:9,color:C.red,fontWeight:700,marginBottom:2}}>⚠ SLOW</div>}
-                  <div style={{fontSize:20,fontWeight:800,color:ph.color}}>{pct}%</div>
-                </div>
-              </div>
-              <div style={{height:3,background:"rgba(255,255,255,0.05)",borderRadius:2,marginBottom:10,overflow:"hidden"}}>
-                <div style={{height:"100%",width:`${pct}%`,background:ph.color,borderRadius:2,transition:"width 0.4s ease"}}/>
-              </div>
-              <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                {phaseTasks.map(task=>{
-                  const isDone=state.taskStatuses[task.key]==="complete";
-                  return(
-                    <label key={task.key} style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
-                      <input type="checkbox" checked={isDone} onChange={()=>dispatch({t:"TASK",key:task.key,status:isDone?"pending":"complete"})} style={{display:"none"}}/>
-                      <div style={{width:14,height:14,borderRadius:3,flexShrink:0,marginTop:2,background:isDone?ph.color:"rgba(255,255,255,0.05)",border:`1px solid ${isDone?ph.color:"rgba(255,255,255,0.1)"}`,display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s"}}>
-                        {isDone&&<span style={{fontSize:8,color:"#000",fontWeight:900}}>✓</span>}
-                      </div>
-                      <div>
-                        <div style={{fontSize:11,fontWeight:600,color:isDone?C.muted:C.text,textDecoration:isDone?"line-through":"none",lineHeight:1.3}}>{task.task}</div>
-                        <div style={{fontSize:10,color:C.muted,marginTop:1}}>{task.tool}</div>
-                      </div>
-                    </label>
-                  );
-                })}
-              </div>
-            </Glass>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── NOTES TAB ─────────────────────────────────────────────────
-function NotesTab(){
-  const {state,dispatch}=useApp();
-  return(
-    <div style={{maxWidth:860,margin:"0 auto",padding:"26px 22px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+      <div class="glass" style="padding:13px 16px;display:flex;align-items:center;gap:11px">
+        ${makePie(overallPct(),"#34D399",62)}
         <div>
-          <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 4px",color:C.text}}>Scratchpad</h1>
-          <p style={{color:C.muted,fontSize:13,margin:0}}>Markdown notes · {state.notesSaved?<span style={{color:C.green}}>✓ Auto-saved</span>:<span style={{color:C.amber}}>⟳ Saving...</span>}</p>
+          <div style="font-size:9px;color:#4A4A5A;margin-bottom:2px">30-DAY SCALE</div>
+          <div style="font-size:11px;color:#9191A4">${totalDone()}/${totalTasks()}</div>
         </div>
-        <Btn v="ghost" size="sm" onClick={()=>navigator.clipboard.writeText(state.notes)}>📋 Copy All</Btn>
-      </div>
-      <Glass style={{padding:4}}>
-        <textarea value={state.notes} onChange={e=>dispatch({t:"NOTES",v:e.target.value})} style={{width:"100%",minHeight:540,background:"transparent",border:"none",outline:"none",color:"#C8C8D0",fontSize:14,lineHeight:"1.75",padding:18,fontFamily:"'SF Mono','Fira Code',monospace",boxSizing:"border-box",resize:"none"}}/>
-      </Glass>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:7}}>
-        <span style={{fontSize:11,color:C.muted}}>{state.notes.split("\n").length} lines · {state.notes.length} chars</span>
-        <span style={{fontSize:11,color:C.muted}}>Auto-saves every 60s to Google Sheet</span>
       </div>
     </div>
-  );
-}
+  `;
+  wrap.appendChild(hdr);
 
-// ── RESOURCES TAB ─────────────────────────────────────────────
-function ResourcesTab(){
-  return(
-    <div style={{maxWidth:960,margin:"0 auto",padding:"26px 22px"}}>
-      <h1 style={{fontSize:24,fontWeight:800,margin:"0 0 6px",color:C.text}}>Resource Vault</h1>
-      <p style={{color:C.muted,fontSize:13,marginBottom:22}}>Every tool you need to launch — no Googling required.</p>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))",gap:10}}>
-        {RESOURCES.map(r=>(
-          <a key={r.name} href={r.url} target="_blank" rel="noreferrer">
-            <Glass style={{padding:16,cursor:"pointer",transition:"all 0.2s",display:"block"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(0,122,255,0.06)";e.currentTarget.style.borderColor="rgba(0,122,255,0.3)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.025)";e.currentTarget.style.borderColor=C.border;}}>
-              <div style={{fontSize:24,marginBottom:6}}>{r.icon}</div>
-              <div style={{fontSize:12,fontWeight:700,color:C.text,marginBottom:2}}>{r.name}</div>
-              <div style={{fontSize:10,color:C.muted,marginBottom:8}}>{r.desc}</div>
-              <div style={{fontSize:10,color:C.blue,fontWeight:700}}>Open →</div>
-            </Glass>
-          </a>
-        ))}
-      </div>
+  // Overall bar
+  const ob = el("div", {class:"glass", style:{padding:"12px 18px",marginBottom:18}});
+  ob.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:12px;color:#4A4A5A">Overall Progress</span>
+      <span style="font-size:12px;font-weight:700;color:#007AFF">${totalDone()} / ${totalTasks()} tasks</span>
     </div>
-  );
-}
+    <div class="prog-wrap">
+      <div class="prog-bar" style="width:${overallPct()}%;background:linear-gradient(90deg,#007AFF,#34D399,#F59E0B)"></div>
+    </div>
+  `;
+  wrap.appendChild(ob);
 
-// ── ONBOARDING ────────────────────────────────────────────────
-function Onboarding(){
-  const {dispatch}=useApp();
-  return(
-    <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:40,background:`radial-gradient(ellipse at 50% 30%, rgba(0,122,255,0.07) 0%, transparent 60%)`}}>
-      <div style={{textAlign:"center",maxWidth:540,animation:"fadeUp 0.6s ease"}}>
-        <div style={{fontSize:54,marginBottom:14}}>⚡</div>
-        <h1 style={{fontSize:36,fontWeight:900,margin:"0 0 12px",letterSpacing:"-1px",color:C.text}}>Execution OS</h1>
-        <p style={{fontSize:15,color:C.sub,lineHeight:1.7,marginBottom:34}}>Your AI-powered business launch system.<br/>100 premium ideas · 7-hour framework · 30-day scaling plan.</p>
-        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap",marginBottom:28}}>
-          <Btn v="primary" size="lg" onClick={()=>dispatch({t:"MODAL",v:true})}>✨ Find My Perfect Idea</Btn>
-          <Btn v="ghost" size="lg" onClick={()=>dispatch({t:"IDEA",v:IDEAS[0]})}>View Demo →</Btn>
+  // Phase cards
+  const grid = el("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:14}});
+
+  PHASE_META.forEach(ph => {
+    const phaseTasks = TASKS[ph.key] || [];
+    const done = countDone(ph.key);
+    const pct = phaseTasks.length ? Math.round((done/phaseTasks.length)*100) : 0;
+
+    const card = el("div", {class:"glass", style:{padding:18,position:"relative",overflow:"hidden"}});
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <span class="badge" style="background:${ph.color}18;border:1px solid ${ph.color}40;color:${ph.color};margin-bottom:5px">${ph.short}</span>
+          <div style="font-size:14px;font-weight:700">${ph.label}</div>
         </div>
-        <div style={{display:"flex",gap:22,justifyContent:"center",flexWrap:"wrap"}}>
-          {["100 Premium Ideas","7-Hour Launch","30-Day Scaling","AI Scripts"].map(f=>(
-            <div key={f} style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:C.muted}}>
-              <div style={{width:5,height:5,borderRadius:"50%",background:C.blue}}/>
-              {f}
+        <div style="font-size:20px;font-weight:800;color:${ph.color}">${pct}%</div>
+      </div>
+      <div class="prog-wrap" style="margin-bottom:10px">
+        <div class="prog-bar" style="width:${pct}%;background:${ph.color}"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${phaseTasks.map(t => {
+          const isDone = !!S.taskDone[t.k];
+          return `<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+            <input type="checkbox" class="task-check" data-key="${t.k}" ${isDone?"checked":""} style="display:none">
+            <div style="width:14px;height:14px;border-radius:3px;flex-shrink:0;margin-top:2px;
+              background:${isDone?ph.color:"rgba(255,255,255,.05)"};
+              border:1px solid ${isDone?ph.color:"rgba(255,255,255,.1)"};
+              display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s">
+              ${isDone?'<span style="font-size:8px;color:#000;font-weight:900">✓</span>':""}
             </div>
-          ))}
-        </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:${isDone?"#555":"#F0F0F5"};text-decoration:${isDone?"line-through":"none"};line-height:1.3">${t.task}</div>
+              <div style="font-size:10px;color:#4A4A5A;margin-top:1px">${t.tool}</div>
+            </div>
+          </label>`;
+        }).join("")}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── NOTES TAB ─────────────────────────────────────
+function renderNotes() {
+  const wrap = el("div", {style:{maxWidth:"860px",margin:"0 auto"}});
+  wrap.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;margin-bottom:4px">Scratchpad</h1>
+        <p style="color:#4A4A5A;font-size:13px">Markdown notes · <span style="color:${S.notesSaved?"#34D399":"#F59E0B"}">${S.notesSaved?"✓ Auto-saved":"⟳ Saving..."}</span></p>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="copy-notes">📋 Copy All</button>
+    </div>
+    <div class="glass" style="padding:4px">
+      <textarea id="notes-area" style="min-height:540px;width:100%;box-sizing:border-box">${S.notes}</textarea>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:7px">
+      <span style="font-size:11px;color:#4A4A5A">${S.notes.split("\n").length} lines · ${S.notes.length} chars</span>
+      <span style="font-size:11px;color:#4A4A5A">Auto-saves every 60s to Google Sheet</span>
+    </div>
+  `;
+  return wrap;
+}
+
+// ── RESOURCES TAB ─────────────────────────────────
+function renderResources() {
+  const wrap = el("div", {style:{maxWidth:"960px",margin:"0 auto"}});
+  wrap.innerHTML = `<h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Resource Vault</h1>
+    <p style="color:#4A4A5A;font-size:13px;margin-bottom:22px">Every tool you need — no Googling required.</p>`;
+  const grid = el("div", {class:"grid-res"});
+  RESOURCES.forEach(r => {
+    grid.innerHTML += `
+      <a href="${r.u}" target="_blank" class="glass" style="padding:16px;display:block;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.background='rgba(0,122,255,.06)';this.style.borderColor='rgba(0,122,255,.3)'"
+        onmouseout="this.style.background='rgba(255,255,255,.025)';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:24px;margin-bottom:6px">${r.i}</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:2px">${r.n}</div>
+        <div style="font-size:10px;color:#4A4A5A;margin-bottom:8px">${r.d}</div>
+        <div style="font-size:10px;color:#007AFF;font-weight:700">Open →</div>
+      </a>`;
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── ACTION DRAWER ─────────────────────────────────
+function renderDrawer() {
+  if (!S.drawerTask) return null;
+  const task = S.drawerTask;
+  const idea = S.idea;
+
+  const ov = el("div", {class:"overlay", id:"drawer-overlay"});
+  const box = el("div", {style:{background:"#0F0F13",border:"1px solid rgba(0,122,255,.35)",borderRadius:20,width:"100%",maxWidth:660,maxHeight:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 0 60px rgba(0,122,255,.2)"}});
+
+  box.innerHTML = `
+    <div style="padding:22px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:6px">ACTION DRAWER — ${task.slot.toUpperCase()}</span>
+        <div style="font-size:20px;font-weight:800">${task.task} Tool-Kit</div>
+        <div style="font-size:12px;color:#4A4A5A;margin-top:3px">${task.action}</div>
+      </div>
+      <button id="close-drawer" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px">✕</button>
+    </div>
+    <div style="flex:1;overflow:auto;padding:22px 26px" id="drawer-body">
+      <div style="background:rgba(0,122,255,.05);border:1px dashed rgba(0,122,255,.2);border-radius:12px;padding:40px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">${["🎯","🔍","💎","🚀","💳","🧲","📡"][task.idx]||"⚡"}</div>
+        <div style="color:#4A4A5A;margin-bottom:20px;font-size:13px">AI generates a custom plan for <strong style="color:#007AFF">${idea?.name||"your idea"}</strong></div>
+        <button class="btn btn-primary" id="gen-drawer-btn">⚡ Generate Action Plan</button>
       </div>
     </div>
-  );
+  `;
+
+  ov.appendChild(box);
+  ov.addEventListener("click", e => { if(e.target===ov) setState({drawerTask:null}); });
+  return ov;
 }
 
-// ── ROOT APP ──────────────────────────────────────────────────
-const TAB_MAP={launchpad:LaunchpadTab,scripts:ScriptsTab,roadmap:RoadmapTab,notes:NotesTab,resources:ResourcesTab};
+// ── IDEA MODAL ────────────────────────────────────
+function renderModal() {
+  if (!S.modalOpen) return null;
+  const ov = el("div", {class:"overlay", id:"modal-overlay"});
+  const box = el("div", {class:"modal"});
 
-function AppShell(){
-  const {state}=useApp();
-  const TabComp=TAB_MAP[state.tab]||LaunchpadTab;
+  box.innerHTML = `
+    <div style="padding:24px 30px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;margin-bottom:8px">IDEA ENGINE — 100 PREMIUM AI BUSINESSES</span>
+        <div style="font-size:22px;font-weight:800">Find Your Perfect Business</div>
+      </div>
+      <button id="close-modal" style="background:rgba(255,255,255,.06);border:none;color:#9191A4;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="flex:1;overflow:auto;padding:26px 30px" id="modal-body">
+      ${renderModalBody()}
+    </div>
+  `;
 
-  return(
-    <>
-      <IdeaModal/>
-      <ActionDrawer/>
-      <Confetti/>
-      {state.phase==="onboarding"&&(
-        <div style={{height:"100vh",display:"flex",flexDirection:"column",background:C.bg}}>
-          <Onboarding/>
-        </div>
-      )}
-      {state.phase==="dashboard"&&(
-        <div style={{height:"100vh",display:"flex",overflow:"hidden",background:C.bg}}>
-          <Sidebar/>
-          <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-            <TopBar/>
-            <div style={{flex:1,overflow:"auto"}}><TabComp/></div>
+  ov.appendChild(box);
+  ov.addEventListener("click", e => { if(e.target===ov) setState({modalOpen:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false}); });
+  return ov;
+}
+
+function renderModalBody() {
+  const step = S.qaStep;
+  const isResults = step >= QUESTIONS.length && S.qaIdeas.length > 0;
+  const isLoading = S.qaLoading;
+
+  if (isLoading) return `
+    <div style="text-align:center;padding:70px 0">
+      <div class="spinner" style="width:52px;height:52px;border:4px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 18px"></div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px">Analyzing Your Profile...</div>
+      <div style="color:#4A4A5A;font-size:13px">Scanning 100 premium ideas · Calculating confidence scores</div>
+    </div>
+  `;
+
+  if (isResults) {
+    const cards = S.qaIdeas.map((idea,i) => {
+      const diff = parseInt(idea.diff)||3;
+      const diffC = {1:"#34D399",2:"#34D399",3:"#F59E0B",4:"#EF4444",5:"#EF4444"}[diff];
+      return `
+        <div class="idea-select-card" data-idx="${i}" style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.borderColor='rgba(0,122,255,.35)';this.style.background='rgba(0,122,255,.05)'"
+          onmouseout="this.style.borderColor='rgba(255,255,255,.07)';this.style.background='rgba(255,255,255,.025)'">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <span class="badge" style="background:rgba(0,122,255,.15);border:1px solid rgba(0,122,255,.4);color:#007AFF;font-size:9px">${(idea.cat||"AI").split(" ")[0]}</span>
+            <span style="font-size:14px;font-weight:800;color:#34D399">${idea.conf}%</span>
           </div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:5px;line-height:1.3">${idea.name}</div>
+          <div style="font-size:11px;color:#4A4A5A;margin-bottom:12px;line-height:1.5">${idea.usp}</div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Revenue</span><span style="font-size:10px;color:#34D399;font-weight:700">$1K–$10K/mo</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#4A4A5A">Difficulty</span><div style="display:flex;gap:2px">${[1,2,3,4,5].map(d=>`<div style="width:7px;height:7px;border-radius:2px;background:${d<=diff?diffC:"rgba(255,255,255,.1)"}"></div>`).join("")}</div></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Launch Speed</span><span style="font-size:10px;color:#F59E0B;font-weight:700">7 hours</span></div>
+          </div>
+          <button class="btn btn-primary btn-sm idea-pick-btn" data-idx="${i}" style="width:100%">🚀 Start Execution</button>
         </div>
-      )}
-    </>
-  );
+      `;
+    }).join("");
+    return `
+      <div style="font-size:12px;color:#34D399;font-weight:700;margin-bottom:18px">✨ ${S.qaIdeas.length} ideas matched — ranked by confidence</div>
+      <div class="grid-auto">${cards}</div>
+    `;
+  }
+
+  // Question view
+  const q = QUESTIONS[step] || QUESTIONS[0];
+  const bars = QUESTIONS.map((_,i) => `<div style="flex:1;height:3px;border-radius:2px;background:${i<=step?"#007AFF":"rgba(255,255,255,.07)"}"></div>`).join("");
+  return `
+    <div style="animation:fadeUp .3s ease">
+      <div style="display:flex;gap:6px;margin-bottom:30px">${bars}</div>
+      <div style="font-size:12px;color:#007AFF;font-weight:700;margin-bottom:10px">QUESTION ${step+1} OF ${QUESTIONS.length}</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:24px">${q.q}</div>
+      <input id="qa-input" class="field" placeholder="${q.p}" value="${S.qaAnswers[step]||""}">
+      <div style="display:flex;justify-content:space-between;margin-top:22px">
+        <button class="btn btn-ghost" id="qa-back" ${step===0?"disabled":""}>← Back</button>
+        <button class="btn btn-primary" id="qa-next">${step===QUESTIONS.length-1?"✨ Find My Ideas →":"Next →"}</button>
+      </div>
+    </div>
+  `;
 }
 
-function App(){
-  return(
-    <AppProvider>
-      <AppShell/>
-    </AppProvider>
-  );
+// ── HOME SCREEN ───────────────────────────────────
+function renderHome() {
+  const wrap = el("div", {id:"app", style:{height:"100vh",display:"flex",flexDirection:"column",background:"#0A0A0B"}});
+  const onboard = el("div", {class:"onboard"});
+  onboard.innerHTML = `
+    <div style="text-align:center;max-width:540px;animation:fadeUp .6s ease">
+      <div style="font-size:54px;margin-bottom:14px">⚡</div>
+      <h1 style="font-size:36px;font-weight:900;margin-bottom:12px;letter-spacing:-1px">Execution OS</h1>
+      <p style="font-size:15px;color:#9191A4;line-height:1.7;margin-bottom:34px">Your AI-powered business launch system.<br>100 premium ideas · 7-hour framework · 30-day scaling plan.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:28px">
+        <button class="btn btn-primary btn-lg" id="home-find-idea">✨ Find My Perfect Idea</button>
+        <button class="btn btn-ghost btn-lg" id="home-demo">View Demo →</button>
+      </div>
+      <div style="display:flex;gap:22px;justify-content:center;flex-wrap:wrap">
+        ${["100 Premium Ideas","7-Hour Launch","30-Day Scaling","AI Scripts"].map(f=>`
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4A4A5A">
+            <div style="width:5px;height:5px;border-radius:50%;background:#007AFF"></div>${f}
+          </div>`).join("")}
+      </div>
+    </div>
+  `;
+  wrap.appendChild(onboard);
+  return wrap;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+// ── MAIN RENDER ───────────────────────────────────
+function render() {
+  const app = document.getElementById("app");
+  if (!app) return;
+
+  // Home page
+  if (S.page === "home") {
+    const newApp = renderHome();
+    newApp.id = "app";
+    app.replaceWith(newApp);
+    bindHomeEvents();
+
+    // Modal
+    const modal = renderModal();
+    if (modal) {
+      document.body.appendChild(modal);
+      bindModalEvents();
+    }
+    return;
+  }
+
+  // Dashboard
+  const newApp = el("div", {id:"app"});
+  const dash = el("div", {class:"dashboard"});
+  dash.appendChild(renderSidebar());
+
+  const main = el("div", {class:"main"});
+  main.appendChild(renderTopbar());
+
+  const content = el("div", {class:"content"});
+  const TAB_FN = {launch:renderLaunch, scripts:renderScripts, roadmap:renderRoadmap, notes:renderNotes, resources:renderResources};
+  content.appendChild((TAB_FN[S.tab]||renderLaunch)());
+  main.appendChild(content);
+  dash.appendChild(main);
+  newApp.appendChild(dash);
+
+  // Modals/drawers
+  const drawer = renderDrawer();
+  if (drawer) newApp.appendChild(drawer);
+  const modal = renderModal();
+  if (modal) newApp.appendChild(modal);
+
+  app.replaceWith(newApp);
+  bindDashEvents();
+}
+
+// ── EVENT BINDING ─────────────────────────────────
+function bindHomeEvents() {
+  document.getElementById("home-find-idea")?.addEventListener("click", () => {
+    setState({modalOpen:true});
+  });
+  document.getElementById("home-demo")?.addEventListener("click", () => {
+    setState({idea:IDEAS[0], page:"dashboard", tab:"launch"});
+  });
+}
+
+function bindModalEvents() {
+  document.getElementById("close-modal")?.addEventListener("click", () => {
+    setState({modalOpen:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false});
+  });
+
+  document.getElementById("qa-input")?.addEventListener("input", e => {
+    S.qaAnswers[S.qaStep] = e.target.value;
+  });
+
+  document.getElementById("qa-back")?.addEventListener("click", () => {
+    if (S.qaStep > 0) setState({qaStep: S.qaStep-1});
+  });
+
+  document.getElementById("qa-next")?.addEventListener("click", handleQANext);
+
+  document.getElementById("qa-input")?.addEventListener("keydown", e => {
+    if (e.key === "Enter") handleQANext();
+  });
+
+  // Idea pick buttons
+  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      const idea = S.qaIdeas[idx];
+      if (idea) {
+        S.idea = idea;
+        S.modalOpen = false;
+        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
+        S.page = "dashboard";
+        S.tab = "launch";
+        gasPost({action:"populateRoadmap",ideaId:idea.id,userProfile:{skillset:S.qaAnswers[0]}});
+        render();
+      }
+    });
+  });
+}
+
+async function handleQANext() {
+  const input = document.getElementById("qa-input");
+  const val = input ? input.value.trim() : (S.qaAnswers[S.qaStep]||"");
+  if (!val) return;
+  S.qaAnswers[S.qaStep] = val;
+
+  if (S.qaStep < QUESTIONS.length - 1) {
+    setState({qaStep: S.qaStep+1});
+    return;
+  }
+
+  // Last question — generate ideas
+  setState({qaLoading:true});
+
+  try {
+    const data = await gasPost({action:"filterTop20",userProfile:{skillset:S.qaAnswers[0],audience:S.qaAnswers[1],result:S.qaAnswers[2],format:S.qaAnswers[3],revenue:S.qaAnswers[4]}});
+    if (data?.top20?.length > 0) {
+      setState({qaIdeas:data.top20, qaLoading:false, qaStep:QUESTIONS.length});
+    } else throw new Error("no results");
+  } catch {
+    // Fallback: local ranking
+    const ranked = IDEAS.map(i=>({...i,conf:75+Math.floor(Math.random()*24)}))
+      .sort((a,b)=>b.conf-a.conf);
+    setState({qaIdeas:ranked, qaLoading:false, qaStep:QUESTIONS.length});
+  }
+}
+
+function bindDashEvents() {
+  // Find idea button
+  document.querySelector(".btn-primary[data-find]")?.addEventListener("click", ()=>setState({modalOpen:true}));
+
+  // Topbar find idea
+  document.querySelectorAll(".btn-primary").forEach(b=>{
+    if(b.textContent.includes("Find Idea")) b.addEventListener("click",()=>setState({modalOpen:true}));
+  });
+
+  // Task checkboxes (roadmap)
+  document.querySelectorAll(".task-check").forEach(cb=>{
+    cb.addEventListener("change", e=>{
+      const key = e.target.dataset.key;
+      S.taskDone[key] = e.target.checked;
+      gasPost({action:"updateProgress",taskKey:key,status:e.target.checked?"complete":"pending"});
+      render();
+    });
+  });
+
+  // Task circle toggle (launchpad)
+  document.querySelectorAll(".check-circle").forEach(c=>{
+    c.addEventListener("click", ()=>{
+      const key = c.dataset.key;
+      S.taskDone[key] = !S.taskDone[key];
+      gasPost({action:"updateProgress",taskKey:key,status:S.taskDone[key]?"complete":"pending"});
+      render();
+    });
+  });
+
+  // Toolkit buttons
+  document.querySelectorAll(".toolkit-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const idx = parseInt(b.dataset.idx);
+      const task = {...TASKS.p1[idx], idx};
+      setState({drawerTask:task});
+    });
+  });
+
+  // Nuclear button
+  document.getElementById("nuclear-btn")?.addEventListener("click", ()=>{
+    spawnConfetti();
+    setState({launched:true});
+  });
+
+  // Go to roadmap
+  document.getElementById("go-roadmap")?.addEventListener("click",()=>setState({tab:"roadmap"}));
+
+  // Drawer generate
+  document.getElementById("gen-drawer-btn")?.addEventListener("click", async()=>{
+    const task = S.drawerTask;
+    const idea = S.idea;
+    const body = document.getElementById("drawer-body");
+    if(!body)return;
+    body.innerHTML = `<div style="text-align:center;padding:50px"><div class="spinner" style="width:36px;height:36px;border:3px solid rgba(0,122,255,.2);border-top-color:#007AFF;margin:0 auto 14px"></div><div style="color:#007AFF;font-size:13px">Generating your plan...</div></div>`;
+
+    const prompts = [
+      `Business: "${idea?.name}". USP: ${idea?.usp}. Write a 6-step market validation plan with search terms, 3 subreddits to check, and 3 qualifying questions for prospects.`,
+      `Business: "${idea?.name}". Identify 5 competitors I should research, what differentiates me, and how to position to win.`,
+      `Business: "${idea?.name}". USP: ${idea?.usp}. Write 3 irresistible offer variants: core promise, price, what is included, one-line pitch.`,
+      `Business: "${idea?.name}". Write complete landing page copy: hero headline, subheadline, 3 benefit bullets, 3 FAQs, CTA text. Ready to paste.`,
+      `Business: "${idea?.name}". Give exact step-by-step Gumroad setup: product creation, pricing, checkout, handling first refund.`,
+      `Business: "${idea?.name}". Write 3 lead magnet ideas with title, format, 50-word description. Then full outline for the best one.`,
+      `Business: "${idea?.name}". Write launch day war room plan: what to post first, metrics to check every 30 min, what to do with zero sales in 3 hours.`,
+    ];
+
+    const result = await askClaude(prompts[task.idx]||prompts[0]);
+    body.innerHTML = `
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px;font-size:13px;line-height:1.75;color:#C8C8D0;white-space:pre-wrap;max-height:320px;overflow:auto">${result}</div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(this.closest('[style]').querySelector('div').textContent)">📋 Copy All</button>
+        <button class="btn btn-ghost btn-sm" id="gen-drawer-btn">🔄 Regenerate</button>
+      </div>
+    `;
+    // Re-bind regen
+    body.querySelector("#gen-drawer-btn")?.addEventListener("click", ()=>{
+      document.getElementById("gen-drawer-btn")?.click();
+    });
+  });
+
+  // Close drawer
+  document.getElementById("close-drawer")?.addEventListener("click",()=>setState({drawerTask:null}));
+
+  // Script type buttons
+  document.querySelectorAll(".script-type-btn").forEach(b=>{
+    b.addEventListener("click", async()=>{
+      const type = b.dataset.type;
+      setState({scriptActive:type});
+
+      if (S.scriptOuts[type]) return;
+      if (!S.idea) return;
+
+      S.scriptLoading[type] = true;
+      render();
+
+      const COPY_PROMPTS = {
+        reddit: `Write a Reddit launch post for: "${S.idea.name}". USP: ${S.idea.usp}. Story-first, reveal product at end. Reddit markdown title and 300-word body.`,
+        twitter: `Write an 8-tweet viral thread for: "${S.idea.name}". USP: ${S.idea.usp}. Tweet 1 is scroll-stopping. Number each "1/" style.`,
+        cold_dm: `Write 3 cold DM versions for: "${S.idea.name}". Short (50 words), Medium (100 words), Story-based (200 words). Human tone.`,
+        linkedin: `Write a LinkedIn launch post for: "${S.idea.name}". Hook, problem, solution, social proof, CTA in comments.`,
+        email: `Write a launch email for: "${S.idea.name}". Subject (2 variants), preview text, full body with hook/story/offer/CTA, PS line.`,
+      };
+
+      const copy = await askClaude(COPY_PROMPTS[type]||COPY_PROMPTS.reddit, "You are an elite direct-response copywriter.");
+      S.scriptOuts[type] = copy;
+      S.scriptLoading[type] = false;
+      render();
+    });
+  });
+
+  // Copy buttons (scripts tab)
+  document.querySelector(".copy-static-scripts")?.addEventListener("click",()=>S.idea&&navigator.clipboard.writeText(S.idea.scripts));
+  document.querySelector(".copy-static-scale")?.addEventListener("click",()=>S.idea&&navigator.clipboard.writeText(S.idea.scale));
+  document.querySelectorAll(".copy-ai-output").forEach(b=>{
+    b.addEventListener("click",()=>navigator.clipboard.writeText(decodeURIComponent(b.dataset.text)));
+  });
+  document.querySelectorAll(".regen-script").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const type=b.dataset.type;
+      S.scriptOuts[type]=null;
+      setState({scriptActive:type});
+      setTimeout(()=>document.querySelector(`.script-type-btn[data-type="${type}"]`)?.click(),100);
+    });
+  });
+
+  // Notes
+  document.getElementById("notes-area")?.addEventListener("input",e=>{
+    S.notes=e.target.value;
+    S.notesSaved=false;
+    clearTimeout(notesTimer);
+    notesTimer=setTimeout(async()=>{
+      await gasPost({action:"saveNotes",notes:S.notes});
+      S.notesSaved=true;
+      const ind=document.querySelector("#notes-area")?.closest(".content")?.querySelector("p span");
+      if(ind){ind.style.color="#34D399";ind.textContent="✓ Auto-saved";}
+    },60000);
+  });
+  document.getElementById("copy-notes")?.addEventListener("click",()=>navigator.clipboard.writeText(S.notes));
+
+  // Modal
+  if(S.modalOpen){
+    bindModalEvents();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────
+render();
 </script>
 </body>
 </html>
