@@ -1058,7 +1058,7 @@ function renderModalBody() {
             <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#4A4A5A">Difficulty</span><div style="display:flex;gap:2px">${[1,2,3,4,5].map(d=>`<div style="width:7px;height:7px;border-radius:2px;background:${d<=diff?diffC:"rgba(255,255,255,.1)"}"></div>`).join("")}</div></div>
             <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4A4A5A">Launch Speed</span><span style="font-size:10px;color:#F59E0B;font-weight:700">7 hours</span></div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="pickIdea(${i})" style="width:100%">🚀 Start Execution</button>
+          <button class="btn btn-primary btn-sm exec-btn" data-idx="${i}" style="width:100%;cursor:pointer" type="button">🚀 Start Execution</button>
         </div>
       `;
     }).join("");
@@ -1566,6 +1566,26 @@ function bindModalEvents() {
     setState({modalOpen:false,qaStep:0,qaAnswers:{},qaIdeas:[],qaLoading:false});
   });
 
+  // Event delegation — catches exec-btn clicks even after innerHTML updates
+  const modalBody = document.getElementById("modal-body");
+  if (modalBody) {
+    modalBody.addEventListener("click", e => {
+      const btn = e.target.closest(".exec-btn, .idea-pick-btn");
+      if (!btn) return;
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      const idea = S.qaIdeas[idx];
+      if (idea) {
+        S.idea = idea;
+        S.modalOpen = false;
+        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = []; S.qaLoading = false;
+        S.page = "dashboard"; S.tab = "launch";
+        gasPost({action:"populateRoadmap", ideaId:idea.id});
+        render();
+      }
+    });
+  }
+
   document.getElementById("qa-input")?.addEventListener("input", e => {
     S.qaAnswers[S.qaStep] = e.target.value;
   });
@@ -1580,8 +1600,8 @@ function bindModalEvents() {
     if (e.key === "Enter") handleQANext();
   });
 
-  // Idea pick buttons
-  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
+  // Idea pick buttons — bind both class names
+  document.querySelectorAll(".idea-pick-btn, .exec-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.idx);
@@ -1589,10 +1609,13 @@ function bindModalEvents() {
       if (idea) {
         S.idea = idea;
         S.modalOpen = false;
-        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
+        S.qaStep = 0;
+        S.qaAnswers = {};
+        S.qaIdeas = [];
+        S.qaLoading = false;
         S.page = "dashboard";
         S.tab = "launch";
-        gasPost({action:"populateRoadmap",ideaId:idea.id,userProfile:{skillset:S.qaAnswers[0]}});
+        gasPost({action:"populateRoadmap", ideaId:idea.id});
         render();
       }
     });
@@ -1649,16 +1672,22 @@ async function handleQANext() {
 }
 
 function bindModalAfterRender() {
-  document.querySelectorAll(".idea-pick-btn").forEach(btn => {
+  // Bind Start Execution buttons (exec-btn) and legacy idea-pick-btn
+  document.querySelectorAll(".exec-btn, .idea-pick-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.idx);
       const idea = S.qaIdeas[idx];
       if (idea) {
-        S.idea = idea; S.modalOpen = false;
-        S.qaStep = 0; S.qaAnswers = {}; S.qaIdeas = [];
-        S.page = "dashboard"; S.tab = "launch";
-        gasPost({action:"populateRoadmap",ideaId:idea.id});
+        S.idea = idea;
+        S.modalOpen = false;
+        S.qaStep = 0;
+        S.qaAnswers = {};
+        S.qaIdeas = [];
+        S.qaLoading = false;
+        S.page = "dashboard";
+        S.tab = "launch";
+        gasPost({action:"populateRoadmap", ideaId:idea.id});
         render();
       }
     });
